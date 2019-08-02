@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\iBDZ.Data\iBDZ.Data.csproj" />
-    <ProjectReference Include="..\iBDZ.Services\iBDZ.Services.csproj" />
   </ItemGroup>
 
 </Project>

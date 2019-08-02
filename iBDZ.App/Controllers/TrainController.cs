@@ -18,7 +18,7 @@ namespace iBDZ.App.Controllers
 
 		[HttpGet]
 		public IActionResult Timetable() {
-			return View();
+			return View(trainService.GetTimetable());
 		}
 
 		[HttpGet]

@@ -5,7 +5,5 @@ namespace iBDZ.Data
 	public class User : IdentityUser
 	{
 		public User() {}
-
-
 	}
 }

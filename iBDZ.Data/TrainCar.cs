@@ -14,6 +14,11 @@ namespace iBDZ.Data
 
 	public class TrainCar
 	{
+		public TrainCar()
+		{
+			Seats = new List<Seat>();
+		}
+
 		public string Id { get; set; }
 		public TrainCarClass Class { get; set; }
 		public TrainCarType Type { get; set; }

@@ -4,6 +4,8 @@
 	{
 		public string Id { get; set; }
 
+		public int SeatNumber { get; set; }
+
 		public int Coupe { get; set; }
 
 		public TrainCar Car { get; set; }

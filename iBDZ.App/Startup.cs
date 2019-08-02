@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using iBDZ.App.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using iBDZ.Data;
+using iBDZ.Services;
+using iBDZ.App.Data.Seeders;
 
 namespace iBDZ.App
 {
@@ -35,11 +32,13 @@ namespace iBDZ.App
 				options.MinimumSameSitePolicy = SameSiteMode.None;
 			});
 
+			services.AddScoped<IRouteService, RouteService>();
+			services.AddScoped<ITrainService, TrainService>();
+
 			services.AddDbContext<ApplicationDbContext>(options =>
 				options.UseSqlServer(
 					Configuration.GetConnectionString("DefaultConnection")));
-			services.AddDefaultIdentity<User>().AddEntityFrameworkStores<ApplicationDbContext>();
-			//services.AddDefaultIdentity<User>().AddRoles<>();
+			services.AddDefaultIdentity<IdentityUser>().AddEntityFrameworkStores<ApplicationDbContext>();
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 		}
@@ -66,17 +65,11 @@ namespace iBDZ.App
 
 			app.UseMvcWithDefaultRoute();
 
-			//app.UseMvc(routes =>
-			//{
-			//	routes.MapRoute(
-			//		name: "default",
-			//		template: "{controller=Home}/{action=Index}/{id?}");
-			//});
+			RouteSeeder rs = new RouteSeeder();
+			TrainSeeder ts = new TrainSeeder();
+			rs.Seed(serviceProvider);
+			ts.Seed(serviceProvider);
 
-			var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-			string[] roles = { "Super user", "Administrator", "User" };
-			
-			RoleManager.CreateAsync()
 		}
 	}
 }

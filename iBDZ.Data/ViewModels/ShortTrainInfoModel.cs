@@ -14,7 +14,7 @@ namespace iBDZ.Data.ViewModels
 
 		public DateTime TimeOfArrival { get; set; }
 
-		public DateTime Delay { get; set; }
+		public DateTime Delay { get; set; } = new DateTime();
 
 		public int FreeSpaces { get; set; }
 	}

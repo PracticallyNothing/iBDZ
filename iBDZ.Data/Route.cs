@@ -8,5 +8,10 @@ namespace iBDZ.Data
 		public string StartStation { get; set; }
 		public string MiddleStation { get; set; }
 		public string EndStation { get; set; }
+
+		public override string ToString()
+		{
+			return StartStation + " - " + (MiddleStation == null ? "" : MiddleStation + " - ") + EndStation;
+		}
 	}
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace iBDZ.Data.ViewModels
 {
@@ -16,6 +14,8 @@ namespace iBDZ.Data.ViewModels
 
 		public DateTime Delay { get; set; } = new DateTime();
 
-		public int FreeSpaces { get; set; }
+		public int FreeSeats { get; set; }
+
+		public int MaxSeats { get; set; }
 	}
 }

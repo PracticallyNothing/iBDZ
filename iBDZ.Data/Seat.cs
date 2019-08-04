@@ -8,6 +8,7 @@
 
 		public int Coupe { get; set; }
 
+		public string CarId { get; set; }
 		public TrainCar Car { get; set; }
 
 		public User Reserver { get; set; } = null;

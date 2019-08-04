@@ -1,11 +1,12 @@
 ﻿using iBDZ.Data.ViewModels;
+using System;
 using System.Collections.Generic;
 
 namespace iBDZ.Services
 {
 	public interface ITrainService
 	{
-		TrainInfoModel GetTrainFromId(string trainId);
-		List<ShortTrainInfoModel> GetTimetable();
+		TrainInfoModel GetTrainInfoFromId(string trainId);
+		Tuple<List<ShortTrainInfoModel>, string, string> GetTimetable(string startStation, string endStation);
 	}
 }

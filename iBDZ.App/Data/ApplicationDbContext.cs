@@ -11,6 +11,15 @@ namespace iBDZ.App.Data
 		{
 		}
 
+		protected override void OnModelCreating(ModelBuilder builder)
+		{
+			builder.Entity<Train>().HasOne(x => x.Route).WithMany(x => x.Trains).HasForeignKey(x => x.RouteId);
+			builder.Entity<TrainCar>().HasOne(x => x.Train).WithMany(x => x.Cars).HasForeignKey(x => x.TrainId);
+			builder.Entity<Seat>().HasOne(x => x.Car).WithMany(x => x.Seats).HasForeignKey(x => x.CarId);
+
+			base.OnModelCreating(builder);
+		}
+
 		public DbSet<Train> Trains { get; set; }
 		public DbSet<TrainCar> TrainCars { get; set; }
 		public DbSet<Route> Routes { get; set; }

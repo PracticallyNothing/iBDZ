@@ -1,9 +1,5 @@
 ﻿using iBDZ.Services;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace iBDZ.App.Controllers
 {
@@ -17,14 +13,15 @@ namespace iBDZ.App.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult Timetable() {
-			return View(trainService.GetTimetable());
+		public IActionResult Timetable(string ss, string es)
+		{
+			return View(trainService.GetTimetable(ss, es));
 		}
 
 		[HttpGet]
-		public IActionResult Info(string trainId)
+		public IActionResult Info(string id)
 		{
-			return View(trainService.GetTrainFromId(trainId));
+			return View(trainService.GetTrainInfoFromId(id));
 		}
 	}
 }

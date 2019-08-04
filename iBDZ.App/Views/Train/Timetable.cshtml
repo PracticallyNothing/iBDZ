@@ -1,27 +1,104 @@
-﻿@model List<iBDZ.Data.ViewModels.ShortTrainInfoModel>
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Tuple<List<iBDZ.Data.ViewModels.ShortTrainInfoModel>, string, string>
 @{
-    <table class="table">
-        <thead>
-            <tr>
-                <td>Route</td>
-                <td>Time of departure</td>
-                <td>Time of arrival</td>
-                <td>Delay</td>
-                <td>Free spaces</td>
-            </tr>
-        </thead>
-        @foreach (var t in Model)
-        {
-            <tr>
-                <td>@t.Route</td>
-                <td>@t.TimeOfDeparture</td>
-                <td>@t.TimeOfArrival</td>
-                <td>@t.Delay</td>
-                <td>@t.FreeSpaces</td>
-            </tr>
-        }
-    </table>
+    ViewData["Title"] = "Timetables";
 }
+
+@using iBDZ.Services
+@inject IRouteService RouteService
+
+<style>
+    #filterBox {
+        border: solid;
+        display: block;
+        background-color: #211f1f;
+        color: #ffffff;
+        width: 50%;
+        margin: 0 auto;
+        padding: 5px;
+        border-radius: 15px;
+    }
+
+    .tableRow:hover{
+        background-color: #bababa;
+        cursor: pointer;
+    }
+
+    .tableRow:active {
+        background-color: #989898;
+        cursor: pointer;
+    }
+
+    .Row {
+        margin: 0 auto;
+    }
+
+    #formSubmit, select {
+        color: black;
+    }
+</style>
+
+<div id="filterBox">
+    <h3>Filter:</h3>
+    <form action="/Train/Timetable" method="get">
+        <div class="Row">
+            <label for="ss">Start station:</label>
+            <select name="ss">
+                <option value=""></option>
+                @foreach (var s in RouteService.GetAllStartingStations())
+                {
+                    if (Model.Item2 == s)
+                    {
+                        <option value="@s" selected="selected">@s</option> }
+                    else
+                    {
+                        <option value="@s">@s</option>}
+                }
+            </select>
+        </div>
+
+        <div>
+            <label for="es">End station:</label>
+            <select name="es">
+                <option value=""></option>
+                @foreach (var s in RouteService.GetAllEndStations())
+                {
+                    if (Model.Item3 == s)
+                    {
+                        <option value="@s" selected="selected">@s</option> }
+                    else
+                    {
+                        <option value="@s">@s</option>}
+                }
+            </select>
+        </div>
+        <div>
+            <input id="formSubmit" type="submit" value="Search" />
+        </div>
+    </form>
+</div>
+
+<script>
+    function showTrainInfo(trainId) {
+        window.location.href = ("/Train/Info?id=" + trainId)
+    }
+</script>
+
+<table class="table">
+    <thead>
+        <tr>
+            <td>Route</td>
+            <td>Time of departure</td>
+            <td>Time of arrival</td>
+            <td>Free spaces</td>
+        </tr>
+    </thead>
+    @foreach (var t in Model.Item1)
+    {
+        <tr class="tableRow" on onclick="showTrainInfo('@t.TrainId')">
+            <td>@t.Route</td>
+            <td>@t.TimeOfDeparture</td>
+            <td>@t.TimeOfArrival</td>
+            <td>@t.FreeSeats / @t.MaxSeats</td>
+        </tr>
+    }
+</table>

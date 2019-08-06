@@ -1,5 +1,6 @@
 ﻿using iBDZ.App.Data;
 using iBDZ.Data;
+using iBDZ.Data.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -32,6 +33,21 @@ namespace iBDZ.Services
 		public List<string> GetAllEndStations()
 		{
 			return db.Routes.Select(x => x.EndStation).Distinct().OrderBy(x => x).ToList();
+		}
+
+		public List<ShortRouteModel> GetAllRoutes()
+		{
+			List<ShortRouteModel> result = new List<ShortRouteModel>(db.Routes.Count());
+			
+			foreach(var r in db.Routes)
+			{
+				result.Add(new ShortRouteModel
+				{
+					Id = r.Id,
+					Route = r.ToString()
+				});
+			}
+			return result;
 		}
 	}
 }

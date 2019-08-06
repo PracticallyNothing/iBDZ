@@ -2,9 +2,11 @@
 using iBDZ.Data;
 using iBDZ.Data.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace iBDZ.Services
 {
@@ -121,7 +123,6 @@ namespace iBDZ.Services
 						Coupe = s.Coupe,
 						Taken = s.Reserver != null,
 					});
-
 				}
 				car.FreeSeats = car.SeatInfo.Count(x => !x.Taken);
 				car.MaxSeats = car.SeatInfo.Count;
@@ -130,6 +131,46 @@ namespace iBDZ.Services
 			}
 
 			return result;
+		}
+
+		// WARNING: Fragile. Do not give unexpected input.
+		private DateTime DecodeDate(string dateString) {
+			Regex regex = new Regex(@"^(\d{2}):(\d{2})\s*([0-3]\d)\.([01]\d)\.(\d{4,})$");
+			Match match = regex.Match(dateString);
+
+			int hours = int.Parse(match.Groups[1].Value);
+			int minutes = int.Parse(match.Groups[2].Value);
+
+			int year = int.Parse(match.Groups[5].Value);
+			int month = int.Parse(match.Groups[4].Value);
+			int date = int.Parse(match.Groups[3].Value);
+
+			return new DateTime(year, month, date, hours, minutes, 0);
+		}
+
+		public void EditTrain(string json)
+		{
+			JObject obj = JObject.Parse(json);
+
+			Train t = db.Trains.Find(obj.GetValue("Id").Value<string>());
+			t.RouteId = obj.GetValue("RouteId").Value<string>();
+			t.TimeOfDeparture = DecodeDate(obj.GetValue("TimeOfDeparture").Value<string>());
+			t.TimeOfArrival = DecodeDate(obj.GetValue("TimeOfArrival").Value<string>());
+			t.Type = (TrainType) Enum.Parse(typeof(TrainType), obj.GetValue("Type").Value<string>());
+
+			db.Trains.Update(t);
+			db.SaveChanges();
+		}
+
+		public void DeleteTrain(string id)
+		{
+			db.Trains.Remove(db.Trains.Find(id));
+			db.SaveChanges();
+		}
+
+		public string GenerateNewTrain()
+		{
+			return "";
 		}
 	}
 }

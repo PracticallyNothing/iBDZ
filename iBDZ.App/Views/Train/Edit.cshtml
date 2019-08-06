@@ -1,0 +1,398 @@
+﻿@using iBDZ.Data.ViewModels;
+@using iBDZ.Services;
+@using iBDZ.Data;
+
+@model TrainInfoModel
+@inject IRouteService RouteService
+
+@{
+    ViewData["Title"] = "Edit train";
+}
+
+<style>
+    #page-title, td, #car-table-title, input[type=datetime] {
+        text-align: center;
+    }
+
+    .tableRow:hover, .tableRow:active {
+        cursor: pointer;
+    }
+
+    .tableRow:hover {
+        background-color: #bababa;
+    }
+
+    .tableRow:active {
+        background-color: #989898;
+    }
+
+    #train-id {
+        font-weight: bold;
+        font-size: larger;
+    }
+
+    table {
+        table-layout: fixed;
+    }
+
+    thead {
+        background-color: #272727;
+        color: #ffffff;
+        border-bottom: solid;
+        border-bottom-width: thick;
+        border-bottom-color: gray;
+    }
+
+    .invalid-date {
+        background-color: red;
+        color: white;
+    }
+
+    .td-data {
+        font-weight: bold;
+        font-size: larger;
+    }
+
+    .undo-button {
+        display: none;
+    }
+
+    #submit-button {
+        margin: 0 auto;
+    }
+</style>
+
+
+<h1 id="page-title">Editing train: <br /><span id="train-id">@Model.Id</span></h1>
+
+<form action="/Train/Edit" method="post" id="train-edit-form">
+    <table class="table">
+        <tr>
+            <td colspan="3">
+                <span class="td-title">Route: </span>
+                <select id="route-select" name="r" onchange="updateRoute()">
+                    @foreach (var r in RouteService.GetAllRoutes())
+                    {
+                        @if (Model.RouteInfo.RouteId == r.Id)
+                        {
+                            <option value="@r.Id" selected="selected">@r.Route</option>
+                        }
+                        else
+                        {
+                            <option value="@r.Id">@r.Route</option>
+                        }
+                    }
+                </select>
+                <button id="undo-route" class="undo-button" type="button" onclick="resetRoute()">Undo</button>
+            </td>
+            <td colspan="3">
+                <span class="td-title">Train type:</span>
+                <select id="traintype-select" name="tt" onchange="updateTrainType()">
+                    @foreach (TrainType e in Enum.GetValues(typeof(TrainType)))
+                    {
+                        if (Model.Type == e)
+                        {
+                            <option value="@e.ToString()" selected="selected">@e.ToString()</option>
+                        }
+                        else
+                        {
+                            <option value="@e.ToString()">@e.ToString()</option>
+                        }
+                    }
+                </select>
+                <button id="undo-traintype" class="undo-button" type="button" onclick="resetTrainType()">Undo</button>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                <span class="td-title">Departs at:</span><br />
+                <input type="datetime" onchange="updateTravelTime()" value="@Model.TimeOfDeparture.ToString(@"hh\:mm dd\.MM\.yyyy")" name="tod" />
+                <button id="undo1" class="undo-button" type="button" onclick="resetDeparture()">Undo</button>
+            </td>
+
+            <td colspan="2">
+                <span class="td-title">Arrives at:</span><br />
+                <input type="datetime" onchange="updateTravelTime()" value="@Model.TimeOfArrival.ToString(@"hh\:mm dd\.MM\.yyyy")" name="toa" />
+                <button id="undo2" class="undo-button" type="button" onclick="resetArrival()">Undo</button>
+            </td>
+
+            <td colspan="2">
+                <span class="td-title">Travel time:</span><br />
+                <span class="td-data" id="travel-time">@((Model.TimeOfArrival - Model.TimeOfDeparture).ToString(@"hh\:mm"))</span>
+            </td>
+        </tr>
+    </table>
+
+
+    <h2 id="car-table-title">Car info:</h2>
+
+    <table class="table">
+        <thead>
+            <tr style="border-top: none">
+                <td colspan="1"></td>
+                <td colspan="8">Type</td>
+                <td colspan="8">Class</td>
+                <td colspan="8">Free seats</td>
+            </tr>
+        </thead>
+        @foreach (var c in Model.TrainCars)
+        {
+            <tr id="car-@c.Id">
+                <td colspan="1" class="tableRow" onclick="deleteCar('@c.Id')"><span class="glyphicon glyphicon-remove"></span></td>
+                <td colspan="8">
+                    <select id="car-type-@c.Id" onchange="updateCarType('@c.Id', '@c.Type.ToString()')">
+                        @foreach (TrainCarType e in Enum.GetValues(typeof(TrainCarType)))
+                        {
+                            if (c.Type == e)
+                            {
+                                <option selected="selected" value="@e.ToString()">@e.ToString()</option>
+                            }
+                            else
+                            {
+                                <option value="@e.ToString()">@e.ToString()</option>
+                            }
+                        }
+                    </select>
+                    <button id="undo-type-@c.Id" class="undo-button" type="button" onclick="resetCarType('@c.Id', '@c.Type.ToString()')">Undo</button>
+                </td>
+                <td colspan="8">
+                    <select id="car-class-@c.Id" onchange="updateCarClass('@c.Id', '@c.Class.ToString()')">
+                        @foreach (TrainCarClass cc in Enum.GetValues(typeof(TrainCarClass)))
+                        {
+                            if (c.Class == cc)
+                            {
+                                <option selected="selected" value="@cc.ToString()">@cc.ToString()</option>
+                            }
+                            else
+                            {
+                                <option value="@cc.ToString()">@cc.ToString()</option>
+                            }
+                        }
+                    </select>
+                    <button id="undo-class-@c.Id" class="undo-button" type="button" onclick="resetCarClass('@c.Id', '@c.Class.ToString()')">Undo</button>
+                </td>
+                <td colspan="8">@c.FreeSeats / @c.MaxSeats</td>
+            </tr>
+            <tr id="car-undo-@c.Id" class="tableRow" style="display:none" onclick="undeleteCar('@c.Id')">
+                <td colspan="25"><span class="glyphicon glyphicon-repeat"></span></td>
+            </tr>
+        }
+        <tr>
+            <td colspan="25" class="tableRow" onclick="createTrainCar()"><span class="glyphicon glyphicon-plus"></span></td>
+        </tr>
+    </table>
+
+    <div class="text-center">
+        <input id="submit-button" type="submit" value="Save changes" />
+    </div>
+</form>
+
+<script>
+    'use strict';
+
+    function resetArrival() {
+        document.getElementsByName("toa")[0].value = "@Model.TimeOfArrival.ToString(@"hh\:mm dd\.MM\.yyyy")"
+        updateTravelTime();
+    }
+
+    function resetDeparture() {
+        document.getElementsByName("tod")[0].value = "@Model.TimeOfDeparture.ToString(@"hh\:mm dd\.MM\.yyyy")"
+        updateTravelTime();
+    }
+
+
+    function daysInMonth(iMonth, iYear) {
+        return 32 - new Date(iYear, iMonth, 32).getDate();
+    }
+
+    function updateTravelTime()
+    {
+        const validTimeRegex = /^(\d{2}):(\d{2})\s*([0-3]\d)\.([01]\d)\.(\d{4,})$/;
+
+        var travelTime = document.getElementById("travel-time")
+        var departs = document.getElementsByName("tod")[0]
+        var arrives = document.getElementsByName("toa")[0]
+
+        if (departs.value != "@Model.TimeOfDeparture.ToString(@"hh\:mm dd\.MM\.yyyy")") {
+            document.getElementById("undo1").className = "";
+        } else {
+            document.getElementById("undo1").className = "undo-button";
+        }
+
+        if (arrives.value != "@Model.TimeOfArrival.ToString(@"hh\:mm dd\.MM\.yyyy")") {
+            document.getElementById("undo2").className = "";
+        } else {
+            document.getElementById("undo2").className = "undo-button";
+        }
+
+        departs.className = "";
+        arrives.className = "";
+        travelTime.classList.remove("invalid-date");
+        document.getElementById("submit-button").removeAttribute("disabled");
+
+        if (!validTimeRegex.test(departs.value.trim())) {
+            departs.className = "invalid-date";
+            document.getElementById("submit-button").setAttribute("disabled", "disabled");
+            return;
+        }
+
+        if (!validTimeRegex.test(arrives.value.trim())) {
+            arrives.className = "invalid-date";
+            document.getElementById("submit-button").setAttribute("disabled", "disabled");
+            return;
+        }
+
+        var departsMatch = validTimeRegex.exec(departs.value.trim());
+
+        var d_year    = departsMatch[5];
+        var d_month   = departsMatch[4] - 1;
+        var d_date    = departsMatch[3];
+        var d_hours   = departsMatch[1];
+        var d_minutes = departsMatch[2];
+
+        var departsDate = new Date(d_year, d_month, d_date, d_hours, d_minutes, 0, 0)
+
+        if (isNaN(departsDate.getTime()) || daysInMonth(d_month, d_year) < d_date) {
+            departs.className = "invalid-date";
+            document.getElementById("submit-button").setAttribute("disabled", "disabled");
+            return;
+        }
+
+        var arrivesMatch = validTimeRegex.exec(arrives.value.trim());
+
+        var a_year    = arrivesMatch[5];
+        var a_month   = arrivesMatch[4] - 1;
+        var a_date    = arrivesMatch[3];
+        var a_hours   = arrivesMatch[1];
+        var a_minutes = arrivesMatch[2];
+
+        var arrivesDate = new Date(a_year, a_month, a_date, a_hours, a_minutes, 0, 0)
+
+        if (isNaN(arrivesDate.getTime()) || daysInMonth(a_month, a_year) < a_date) {
+            arrives.className = "invalid-date";
+            document.getElementById("submit-button").setAttribute("disabled", "disabled");
+            return;
+        }
+
+        let diff_ms = arrivesDate - departsDate;
+
+        let diff_mins = Math.abs(diff_ms / 60000);
+        let diff_hours = Math.abs(Math.floor(diff_mins / 60));
+        let diff_days = Math.abs(Math.floor(diff_hours / 24));
+        diff_mins %= 60;
+        diff_hours %= 24;
+
+        if (diff_hours < 10) {
+            diff_hours = "0" + diff_hours;
+        }
+        if (diff_mins < 10) {
+            diff_mins = "0" + diff_mins;
+        }
+
+        travelTime.innerHTML = (diff_ms < 0 ? "- " : "") + (diff_days > 0 ? Math.abs(diff_days) + "d. " : "") + diff_hours + ":" + diff_mins;
+
+        if (diff_ms <= 0) {
+            travelTime.classList.add("invalid-date");
+            departs.className = "invalid-date";
+            arrives.className = "invalid-date";
+            document.getElementById("submit-button").setAttribute("disabled", "disabled");
+            return;
+        }
+    }
+
+    function createTrainCar() {
+
+    }
+
+    function deleteCar(id) {
+        document.getElementById('car-' + id).setAttribute('style', 'display:none;');
+        document.getElementById('car-undo-' + id).setAttribute('style', '');
+    }
+
+    function undeleteCar(id) {
+        document.getElementById('car-' + id).setAttribute('style', '');
+        document.getElementById('car-undo-' + id).setAttribute('style', 'display:none;');
+    }
+
+    function updateRoute() {
+        if (document.getElementById("route-select").value != "@Model.RouteInfo.RouteId")
+            document.getElementById("undo-route").className = "";
+        else
+            document.getElementById("undo-route").className = "undo-button";
+    }
+
+    function resetRoute() {
+        document.getElementById("route-select").value = "@Model.RouteInfo.RouteId";
+        updateRoute();
+    }
+
+    function updateTrainType() {
+        if (document.getElementById("traintype-select").value != "@Model.Type.ToString()")
+            document.getElementById("undo-traintype").className = "";
+        else
+            document.getElementById("undo-traintype").className = "undo-button";
+    }
+
+    function resetTrainType() {
+        document.getElementById("traintype-select").value = "@Model.Type.ToString()";
+        updateTrainType();
+    }
+
+    function updateCarType(id, defaultValue) {
+        if (document.getElementById("car-type-" + id).value != defaultValue)
+            document.getElementById("undo-type-" + id).className = "";
+        else
+            document.getElementById("undo-type-" + id).className = "undo-button";
+    }
+
+    function updateCarClass(id, defaultValue) {
+        if (document.getElementById("car-class-" + id).value != defaultValue)
+            document.getElementById("undo-class-" + id).className = "";
+        else
+            document.getElementById("undo-class-" + id).className = "undo-button";
+    }
+
+    function resetCarType(id, value) { document.getElementById("car-type-" + id).value = value; updateCarType(id, value); }
+    function resetCarClass(id, value) { document.getElementById("car-class-" + id).value = value; updateCarClass(id, value); }
+
+    var form = document.getElementById("train-edit-form")
+
+    function gatherTrainCars() {
+        let res = [];
+
+
+
+        return res;
+    }
+
+    form.onsubmit = function (e)
+    {
+        e.preventDefault();
+
+        var data = {
+            Id: "@Model.Id",
+            RouteId: form[0].value,
+            Type: form[2].value,
+            TimeOfDeparture: form[4].value,
+            TimeOfArrival: form[6].value,
+            TrainCars: [],
+        }
+
+        let xhr = new XMLHttpRequest();
+        xhr.open(form.method, form.action, true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+        xhr.onloadstart = function () {
+            let submit = document.getElementById("submit-button")
+            submit.value = "Saving..."
+            submit.setAttribute("disabled", "");
+        }
+
+        xhr.onloadend = function () {
+            window.location.href = xhr.responseURL
+        }
+
+        xhr.send(JSON.stringify(data));
+    }
+</script>

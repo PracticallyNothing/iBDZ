@@ -1,0 +1,150 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Find seats";
+}
+
+@using iBDZ.Services;
+@using iBDZ.Data;
+
+@inject IRouteService RouteService
+@inject ISeatService SeatService
+
+<h2 class="text-center">Find seats</h2>
+
+<form method="post" action="/Seat/Find" onsubmit="findSeats(event)">
+    <div class="text-center">
+        <label for="select-route">Route:</label>
+        <select id="select-route">
+            @foreach (var r in RouteService.GetAllRoutes())
+            {
+                <option value="@r.Id">@r.Route</option>
+            }
+        </select>
+    </div>
+
+    <div class="text-center">
+        <label for="select-type">Type:</label>
+        <select id="select-type">
+            @foreach (TrainCarType t in Enum.GetValues(typeof(TrainCarType)))
+            {
+                <option value="@t.ToString()">@t.ToString()</option>
+            }
+        </select>
+    </div>
+
+    <div class="text-center">
+        <label for="select-class">Class:</label>
+        <select id="select-class">
+            <option value="Any">Any</option>
+            @foreach (TrainCarClass c in Enum.GetValues(typeof(TrainCarClass)))
+            {
+                <option value="@c.ToString()">@c.ToString()</option>
+            }
+        </select>
+    </div>
+
+    <div class="text-center">
+        <label for="num-seats">Number of seats:</label>
+        <input id="num-seats" type="number" value="1" min="1" max="8" />
+    </div>
+
+    <div class="text-center">
+        <button type="submit" id="form-submit">Find seats</button>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr><td id="results-heading" colspan="6" style="text-align:center;"><h2>Results</h2></td></tr>
+        <tr id="headings-row">
+            <td>Train info</td>
+            <td>Train car Id</td>
+            <td>Train car type</td>
+            <td>Seat class</td>
+            <td>Coupe</td>
+            <td>Num. seats</td>
+        </tr>
+    </thead>
+    <tbody id="results-body"></tbody>
+</table>
+
+<script>
+    var form = document.getElementsByTagName("form")[1]
+
+    function clearResults() {
+        document.getElementById("results-body").innerHTML = "";
+    }
+
+    function populateResults(results) {
+        let tbody = document.getElementById("results-body")
+        if (results.length == 0) {
+            tbody.innerHTML = '<td style="text-align:center; font-weight: bold;" colspan="6">No results found.</td>';
+            return;
+        }
+
+        if (results[0].type == "Beds") {
+            document.getElementById("headings-row").innerHTML =
+                '<td>Train info</td>' +
+                '<td>Train car Id</td>' +
+                '<td>Train car type</td>' +
+                '<td>Coupe</td>' +
+                '<td>Num. seats</td>';
+            document.getElementById("results-heading").setAttribute("colspan", "5");
+        } else {
+            document.getElementById("headings-row").innerHTML =
+                '<td>Train info</td>' +
+                '<td>Train car Id</td>' +
+                '<td>Train car type</td>' +
+                '<td>Seat class</td>' +
+                '<td>Coupe</td>' +
+                '<td>Num. seats</td>';
+            document.getElementById("results-heading").setAttribute("colspan", "6");
+        }
+
+        let html = "";
+        for (let row of results) {
+            html +=
+                '<tr>' +
+                '<td><a href="/Train/Info?id=' + row.trainId + '">View train info</a></td>' +
+                '<td>' + row.carId + '</td>' +
+                '<td>' + row.type + '</td>' +
+                (row.type == "Beds" ? '' : '<td>' + row.class + '</td>') +
+                '<td>' + row.coupeNumber + '</td>' +
+                '<td>' + row.freeSeats + '/' + row.maxSeats + '</td>' +
+                '</tr>'
+        }
+
+        tbody.innerHTML = html;
+    }
+
+    function findSeats(event) {
+        event.preventDefault();
+
+        let data = {
+            RouteId: form[0].value,
+            Type: form[1].value,
+            Class: form[2].value,
+            NumSeats: form[3].value
+        }
+
+        let xhr = new XMLHttpRequest();
+        xhr.open(form.method, form.action, true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+        xhr.onloadstart = function () {
+            document.getElementById("form-submit").innerHTML = "Searching...";
+            document.getElementById("form-submit").setAttribute("disabled", "disabled");
+        }
+
+        xhr.onloadend = function () {
+            document.getElementById("form-submit").innerHTML = "Find seats";
+            document.getElementById("form-submit").removeAttribute("disabled");
+            clearResults();
+            populateResults(JSON.parse(xhr.responseText))
+        }
+
+        xhr.send(JSON.stringify(data));
+    }
+</script>

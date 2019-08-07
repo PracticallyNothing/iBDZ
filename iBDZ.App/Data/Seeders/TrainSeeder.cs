@@ -12,32 +12,37 @@ namespace iBDZ.App.Data.Seeders
 	{
 		public void Seed(IServiceProvider serviceProvider)
 		{
-			Random r = new Random();
-
 			var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
 			if (!db.Trains.Any() && db.Routes.Any())
 			{
 				for (int i = 0; i < NumTrains; i++)
 				{
-					DateTime today = DateTime.Today;
-					DateTime timeOfDep = today.AddHours(r.NextDouble() * 7 + 4);
-					DateTime timeOfArrival = timeOfDep.AddMinutes(r.NextDouble() * 120 + 125);
-
-					Train t = new Train()
-					{
-						Route = db.Routes.Skip(r.Next(0, db.Routes.Count() - 1)).First(),
-						TimeOfDeparture = timeOfDep,
-						TimeOfArrival = timeOfArrival,
-						Type = (TrainType)Enum.GetValues(typeof(TrainType)).GetValue(r.Next(Enum.GetValues(typeof(TrainType)).Length)),
-					};
-
-					t.RouteId = t.Route.Id;
-
-					FillTrainCars(r.Next(MinNumCars, MaxNumCars), t, db);
+					Train t = GenTrain(db);
 					db.Trains.Add(t);
 					db.SaveChanges();
 				}
 			}
+		}
+
+		public static Train GenTrain(ApplicationDbContext db) {
+			Random r = new Random();
+
+			DateTime today = DateTime.Today;
+			DateTime timeOfDep = today.AddHours(r.NextDouble() * 7 + 4);
+			DateTime timeOfArrival = timeOfDep.AddMinutes(r.NextDouble() * 120 + 125);
+
+			Train t = new Train()
+			{
+				Route = db.Routes.Skip(r.Next(0, db.Routes.Count() - 1)).First(),
+				TimeOfDeparture = timeOfDep,
+				TimeOfArrival = timeOfArrival,
+				Type = (TrainType)Enum.GetValues(typeof(TrainType)).GetValue(r.Next(Enum.GetValues(typeof(TrainType)).Length)),
+			};
+
+			t.RouteId = t.Route.Id;
+
+			FillTrainCars(r.Next(MinNumCars, MaxNumCars), t, db);
+			return t;
 		}
 
 		private const int NumTrains = 10;
@@ -51,7 +56,7 @@ namespace iBDZ.App.Data.Seeders
 		// What relative part of all train cars will be second class?
 		private const double SecondClassDistrib = 2;
 
-		private void FillTrainCars(int numCars, Train train, ApplicationDbContext db)
+		private static void FillTrainCars(int numCars, Train train, ApplicationDbContext db)
 		{
 			RatioDistributor rd = new RatioDistributor(SecondClassDistrib, FirstClassDistrib, BedCarsDistrib);
 			var carDistributions = rd.DistributeInt(numCars);
@@ -97,7 +102,7 @@ namespace iBDZ.App.Data.Seeders
 			}
 		}
 
-		private void FillSeats(TrainCar car, ApplicationDbContext db)
+		private static void FillSeats(TrainCar car, ApplicationDbContext db)
 		{
 			// Every train car is split into nine coupes...
 			for (int i = 0; i < 9; i++)

@@ -133,7 +133,6 @@
 
         let xhr = new XMLHttpRequest();
         xhr.open("POST", "/Train/Delete", true);
-        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 
         xhr.onloadstart = function () {
             let buttons = document.getElementsByClass("disable-on-delete");
@@ -146,6 +145,8 @@
         xhr.onloadend = function () {
             window.location.href = xhr.responseURL;
         }
+
+        xhr.send();
     }
 </script>
 

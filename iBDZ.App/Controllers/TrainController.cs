@@ -35,7 +35,7 @@ namespace iBDZ.App.Controllers
 			return Redirect("/Train/Timetable");
 		}
 
-		[HttpPost]
+		[HttpGet]
 		[Authorize(Roles = "Administrator, SuperUser")]
 		public IActionResult New()
 		{
@@ -57,6 +57,5 @@ namespace iBDZ.App.Controllers
 		{
 			return View(trainService.GetTrainInfoFromId(id));
 		}
-
 	}
 }

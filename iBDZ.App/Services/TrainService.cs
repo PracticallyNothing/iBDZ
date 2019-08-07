@@ -1,4 +1,5 @@
 ﻿using iBDZ.App.Data;
+using iBDZ.App.Data.Seeders;
 using iBDZ.Data;
 using iBDZ.Data.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -170,7 +171,10 @@ namespace iBDZ.Services
 
 		public string GenerateNewTrain()
 		{
-			return "";
+			Train t = TrainSeeder.GenTrain(db);
+			db.Trains.Add(t);
+			db.SaveChanges();
+			return t.Id;
 		}
 	}
 }

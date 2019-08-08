@@ -2,3 +2,14 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
+
+function postDataAsJSON(href, data, onloadstart) {
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST', href, true);
+    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+    xhr.onloadstart = onloadstart
+    xhr.onloadend = function () { window.location.href = xhr.responseURL; }
+
+    xhr.send(JSON.stringify(data));
+}

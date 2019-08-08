@@ -18,16 +18,6 @@
         border-radius: 15px;
     }
 
-    .tableRow:hover{
-        background-color: #bababa;
-        cursor: pointer;
-    }
-
-    .tableRow:active {
-        background-color: #989898;
-        cursor: pointer;
-    }
-
     .Row {
         margin: 0 auto;
     }
@@ -94,7 +84,7 @@
     </thead>
     @foreach (var t in Model.Item1)
     {
-        <tr class="tableRow" on onclick="showTrainInfo('@t.TrainId')">
+        <tr class="clickable" on onclick="showTrainInfo('@t.TrainId')">
             <td>@t.Route</td>
             <td>@t.TimeOfDeparture</td>
             <td>@t.TimeOfArrival</td>

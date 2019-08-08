@@ -14,18 +14,6 @@
         text-align: center;
     }
 
-    .tableRow:hover, .tableRow:active {
-        cursor: pointer;
-    }
-
-    .tableRow:hover {
-        background-color: #bababa;
-    }
-
-    .tableRow:active {
-        background-color: #989898;
-    }
-
     #train-id {
         font-weight: bold;
         font-size: larger;
@@ -139,7 +127,7 @@
         @foreach (var c in Model.TrainCars)
         {
             <tr id="car-@c.Id">
-                <td colspan="1" class="tableRow" onclick="deleteCar('@c.Id')"><span class="glyphicon glyphicon-remove"></span></td>
+                <td colspan="1" class="clickable" onclick="deleteCar('@c.Id')"><span class="glyphicon glyphicon-remove"></span></td>
                 <td colspan="8">
                     <select id="car-type-@c.Id" onchange="updateCarType('@c.Id', '@c.Type.ToString()')">
                         @foreach (TrainCarType e in Enum.GetValues(typeof(TrainCarType)))
@@ -174,12 +162,12 @@
                 </td>
                 <td colspan="8">@c.FreeSeats / @c.MaxSeats</td>
             </tr>
-            <tr id="car-undo-@c.Id" class="tableRow" style="display:none" onclick="undeleteCar('@c.Id')">
+            <tr id="car-undo-@c.Id" class="clickable" style="display:none" onclick="undeleteCar('@c.Id')">
                 <td colspan="25"><span class="glyphicon glyphicon-repeat"></span></td>
             </tr>
         }
         <tr>
-            <td colspan="25" class="tableRow" onclick="createTrainCar()"><span class="glyphicon glyphicon-plus"></span></td>
+            <td colspan="25" class="clickable" onclick="createTrainCar()"><span class="glyphicon glyphicon-plus"></span></td>
         </tr>
     </table>
 
@@ -378,20 +366,11 @@
             TrainCars: [],
         }
 
-        let xhr = new XMLHttpRequest();
-        xhr.open(form.method, form.action, true);
-        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-
-        xhr.onloadstart = function () {
-            let submit = document.getElementById("submit-button")
-            submit.value = "Saving..."
-            submit.setAttribute("disabled", "");
-        }
-
-        xhr.onloadend = function () {
-            window.location.href = xhr.responseURL
-        }
-
-        xhr.send(JSON.stringify(data));
+        sendDataAsJSON(form.action, data,
+            function () {
+                let submit = document.getElementById("submit-button")
+                submit.value = "Saving..."
+                submit.setAttribute("disabled", "");
+            })
     }
 </script>

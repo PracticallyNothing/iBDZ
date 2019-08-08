@@ -1,0 +1,44 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Receipt";
+}
+
+@model iBDZ.Data.ViewModels.ReceiptModel
+
+<h2 class="text-center">Receipt</h2>
+
+<div class="text-center">
+    <hr />
+
+    <h2>Train ID: <br /><b>@Model.TrainId</b></h2>
+    <h4>On route: <b>@Model.Route</b></h4>
+    <h4>Departs at: <b>@Model.TimeOfDeparture.ToShortTimeString()</b> | Arrives at: <b>@Model.TimeOfArrival.ToShortTimeString()</b></h4>
+
+    <hr />
+
+    <h3>Train Car ID: <b>@Model.CarId</b></h3>
+    <h4>Type: <b>@Model.Type.ToString()</b></h4>
+    <h4>Class: <b>@Model.Class.ToString()</b></h4>
+
+    <hr />
+
+    <h3>Coupe: <b>@Model.Coupe</b></h3>
+    <h4>
+        Seat numbers reserved:<br />
+        @String.Join(',', Model.ReservedSeatNumbers.Select(x => "<b>" + x.ToString() + "</b>"));
+    </h4>
+
+    <hr />
+
+    <h3>Price of purchase: <b>@(String.Format("{0:.##}", Model.PriceLevs)) levs</b></h3>
+
+    <hr />
+
+    <p style="color:gray; font-weight:lighter; font-style: italic">
+        Receipt id: @Model.Id<br />
+        Time of purchase: @Model.TimeOfPurchase.ToString(@"hh\:mm dd\.MM\.yyyy")<br />
+        Thanks for shopping with iBDZ!
+    </p>
+</div>

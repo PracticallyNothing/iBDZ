@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using iBDZ.Services;
 using iBDZ.App.Data.Seeders;
+using iBDZ.Data;
 
 namespace iBDZ.App
 {
@@ -39,7 +40,7 @@ namespace iBDZ.App
 			services.AddDbContext<ApplicationDbContext>(options => {
 				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
 			});
-			services.AddDefaultIdentity<IdentityUser>().AddEntityFrameworkStores<ApplicationDbContext>();
+			services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 		}

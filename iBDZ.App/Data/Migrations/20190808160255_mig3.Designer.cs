@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using iBDZ.App.Data;
 
 namespace iBDZ.App.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190808160255_mig3")]
+    partial class mig3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,8 +28,6 @@ namespace iBDZ.App.Data.Migrations
 
                     b.Property<decimal>("PriceLevs");
 
-                    b.Property<string>("ReceiptId");
-
                     b.Property<string>("SeatId");
 
                     b.Property<DateTime>("TimeOfPurchase");
@@ -36,23 +36,11 @@ namespace iBDZ.App.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReceiptId");
-
                     b.HasIndex("SeatId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Purchases");
-                });
-
-            modelBuilder.Entity("iBDZ.Data.Receipt", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Receipts");
                 });
 
             modelBuilder.Entity("iBDZ.Data.Route", b =>
@@ -296,10 +284,6 @@ namespace iBDZ.App.Data.Migrations
 
             modelBuilder.Entity("iBDZ.Data.Purchase", b =>
                 {
-                    b.HasOne("iBDZ.Data.Receipt", "Receipt")
-                        .WithMany("Purchases")
-                        .HasForeignKey("ReceiptId");
-
                     b.HasOne("iBDZ.Data.Seat", "Seat")
                         .WithMany()
                         .HasForeignKey("SeatId");

@@ -59,7 +59,6 @@
     <thead>
         <tr><td id="results-heading" colspan="6" style="text-align:center;"><h2>Results</h2></td></tr>
         <tr id="headings-row">
-            <td>Train info</td>
             <td>Train car Id</td>
             <td>Train car type</td>
             <td>Seat class</td>
@@ -84,39 +83,53 @@
             return;
         }
 
+        let colspan = 6;
+
         if (results[0].type == "Beds") {
             document.getElementById("headings-row").innerHTML =
-                '<td>Train info</td>' +
-                '<td>Train car Id</td>' +
-                '<td>Train car type</td>' +
-                '<td>Coupe</td>' +
-                '<td>Num. seats</td>';
-            document.getElementById("results-heading").setAttribute("colspan", "5");
+                '<td colspan="2">Train car Id</td>' +
+                '<td colspan="2">Train car type</td>' +
+                '<td colspan="2">Coupe</td>' +
+                '<td colspan="2">Num. seats</td>' +
+                '<td></td>';
+            colspan = 9;
         } else {
             document.getElementById("headings-row").innerHTML =
-                '<td>Train info</td>' +
-                '<td>Train car Id</td>' +
-                '<td>Train car type</td>' +
-                '<td>Seat class</td>' +
-                '<td>Coupe</td>' +
-                '<td>Num. seats</td>';
-            document.getElementById("results-heading").setAttribute("colspan", "6");
+                '<td colspan="2">Train car Id</td>' +
+                '<td colspan="2">Train car type</td>' +
+                '<td colspan="2">Seat class</td>' +
+                '<td colspan="2">Coupe</td>' +
+                '<td colspan="2">Num. seats</td>' +
+                '<td></td>';
+            colspan = 11;
         }
+        document.getElementById("results-heading").setAttribute("colspan", colspan);
 
+        let currTrainId = "";
         let html = "";
+
         for (let row of results) {
+            if (currTrainId != row.trainId) {
+                html += '<tr><td style="text-align:center; font-size: large; font-weight: bold;" colspan="' + colspan + '"><a href="/Train/Info?id=' + row.trainId + '">View train info</a></td></tr>';
+                currTrainId = row.trainId;
+            }
+
             html +=
                 '<tr>' +
-                '<td><a href="/Train/Info?id=' + row.trainId + '">View train info</a></td>' +
-                '<td>' + row.carId + '</td>' +
-                '<td>' + row.type + '</td>' +
-                (row.type == "Beds" ? '' : '<td>' + row.class + '</td>') +
-                '<td>' + row.coupeNumber + '</td>' +
-                '<td>' + row.freeSeats + '/' + row.maxSeats + '</td>' +
-                '</tr>'
+                '<td colspan="2">' + row.carId + '</td>' +
+                '<td colspan="2">' + row.type + '</td>' +
+                (row.type == "Beds" ? '' : '<td colspan="2">' + row.class + '</td>') +
+                '<td colspan="2">' + row.coupeNumber + '</td>' +
+                '<td colspan="2">' + row.freeSeats + '/' + row.maxSeats + '</td>' +
+                '<td><button type="button" onclick="reserveSeat(\'' + row.carId + '\', ' + row.coupeNumber + ')">Reserve seats</button></td>'
+            '</tr>'
         }
 
         tbody.innerHTML = html;
+    }
+
+    function reserveSeat(carId, coupeNumber) {
+        window.location.href = '/Seat/Reserve?car=' + carId + '&coupe=' + coupeNumber;
     }
 
     function findSeats(event) {

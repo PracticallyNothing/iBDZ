@@ -105,7 +105,7 @@ namespace iBDZ.App.Data.Seeders
 		private static void FillSeats(TrainCar car, ApplicationDbContext db)
 		{
 			// Every train car is split into nine coupes...
-			for (int i = 0; i < 9; i++)
+			for (int i = 1; i <= 9; i++)
 			{
 				// ... however, compartment and sleeping cars have a different number of places available.
 				if (car.Type == TrainCarType.Compartments)

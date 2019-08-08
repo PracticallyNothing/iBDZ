@@ -33,7 +33,7 @@ namespace iBDZ.App.Controllers
 		[Authorize]
 		public IActionResult ReservePost()
 		{
-			return View();
+			return View(seatService.ReserveSeat(User, new StreamReader(Request.Body).ReadToEnd()));
 		}
 
 		[HttpGet]

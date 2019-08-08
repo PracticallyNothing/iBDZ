@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace iBDZ.App.Data
 {
-	public class ApplicationDbContext : IdentityDbContext
+	public class ApplicationDbContext : IdentityDbContext<User>
 	{
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 			: base(options)
@@ -24,5 +24,7 @@ namespace iBDZ.App.Data
 		public DbSet<TrainCar> TrainCars { get; set; }
 		public DbSet<Route> Routes { get; set; }
 		public DbSet<Seat> Seats { get; set; }
+		public DbSet<Purchase> Purchases { get; set; }
+		public DbSet<Receipt> Receipts { get; set; }
 	}
 }

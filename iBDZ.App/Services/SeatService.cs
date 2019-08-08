@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 
 namespace iBDZ.Services
 {
@@ -47,13 +48,16 @@ namespace iBDZ.Services
 			List<TrainCar> filtered;
 
 			if (ClassString == "Any")
+			{
 				filtered = db.TrainCars
 					.Include(x => x.Seats)
 					.Include(x => x.Train).ThenInclude(x => x.Route)
 					.Where(x => x.Train.RouteId == RouteId
 							 && x.Type == TrainCarType)
 					.ToList();
+			}
 			else
+			{
 				filtered = db.TrainCars
 					.Include(x => x.Seats)
 					.Include(x => x.Train).ThenInclude(x => x.Route)
@@ -61,6 +65,7 @@ namespace iBDZ.Services
 							 && x.Type == TrainCarType
 							 && x.Class == Enum.Parse<TrainCarClass>(ClassString))
 					.ToList();
+			}
 
 			List<SeatSearchResultModel> res = new List<SeatSearchResultModel>();
 
@@ -79,7 +84,7 @@ namespace iBDZ.Services
 					res.Add(new SeatSearchResultModel()
 					{
 						TrainId = c.Train.Id,
-						CarId = c.Id,
+						CarId = c.Id.Substring(0, 4),
 						Type = c.Type.ToString(),
 						Class = c.Class.ToString(),
 						CoupeNumber = cc.Coupe,
@@ -90,6 +95,35 @@ namespace iBDZ.Services
 			}
 
 			return res;
+		}
+
+		public string ReserveSeat(ClaimsPrincipal user, string jsonString)
+		{
+			Receipt receipt = new Receipt();
+
+			JObject json = JObject.Parse(jsonString);
+			List<string> seats = json["seats"].Value<List<string>>();
+			
+			foreach(string SeatId in seats)
+			{
+				Purchase p = new Purchase()
+				{
+					TimeOfPurchase = DateTime.Now,
+					PriceLevs = json["priceLevs"].Value<decimal>(),
+					User = db.Users.Where(x => x.UserName == user.Identity.Name).First(),
+					Seat = db.Seats.Find(SeatId),
+					Receipt = receipt,
+				};
+
+				p.Seat.Reserver = p.User;
+
+				receipt.Purchases.Add(p);
+				db.Purchases.Add(p);
+			}
+
+			db.Receipts.Add(receipt);
+			db.SaveChanges();
+			return receipt.Id;
 		}
 	}
 }

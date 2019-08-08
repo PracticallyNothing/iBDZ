@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Purchases";
+}
+
+@using iBDZ.Data.ViewModels;
+
+@model List<ShortPurchaseModel>
+
+<style>
+    .clickable:hover, .clickable:active {
+        cursor: pointer;
+    }
+
+    .clickable:hover {
+        background-color: #bababa;
+    }
+
+    .clickable:active {
+        background-color: #989898;
+    }
+</style>
+
+<table class="table">
+    <thead>
+        <tr>
+            <td colspan="4">Route</td>
+            <td colspan="4">Time of purchase</td>
+            <td colspan="4">Price (lv.)</td>
+            <td colspan="1"></td>
+        </tr>
+    </thead>
+    @foreach (var purchase in Model)
+    {
+        <tr class="clickable" onclick="showReceipt('@purchase.Id')">
+            <td colspan="4">@purchase.Route</td>
+            <td colspan="4">@purchase.TimeOfPurchase.ToString()</td>
+            <td colspan="4">@purchase.PriceLevs lv.</td>
+            <td colspan="1"><span class="glyphicon glyphicon-menu-right"></span></td>
+        </tr>
+    }
+</table>
+
+<script>
+    function showReceipt(id) { window.location.href = "/User/Receipt?id=" + id }
+</script>

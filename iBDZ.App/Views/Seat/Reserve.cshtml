@@ -1,42 +1,35 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-    ViewData["Title"] = "Reserve";
-}
+﻿@{ ViewData["Title"] = "Reserve"; }
 
 <h2 class="text-center">Reserve seats</h2>
 
-<div class="text-center">
-    <hr />
+@using iBDZ.Data.ViewModels
+@model ReservationInfoModel
 
-    <h2>Train ID: <br /><b>18a2f226-ccee-40b7-b600-45cf04a48b93</b></h2>
-    <h4>With route: <a style="font-weight: bold" href="/Train/Timetable?ss=Варна&es=София">Варна - Горна Оряховица - София</a></h4>
-    <h4>Departs at: <b>13:30</b> | Arrives at: <b>20:30</b></h4>
+<form onsubmit="finalizePurchase(event)">
+    <div class="text-center">
+        <hr />
 
-    <hr />
+        <h2>Train: @Model.TrainId</h2>
+        <h3>Car ID: <b>@Model.CarId</b></h3>
+        <h4>Type: <b>@Model.Type.ToString()</b></h4>
+        <h4>Class: <b>@Model.Class.ToString()</b></h4>
 
-    <h3>Train Car ID: <b>18a2</b></h3>
-    <h4>Type: <b>Compartments</b></h4>
-    <h4>Class: <b>First</b></h4>
+        <hr />
 
-    <hr />
+        <h3>Coupe: <b>@Model.Coupe</b></h3>
+        <label for="num-seats">Number of seats</label>
+        <input name="num-seats" type="number" min="1" max="@Model.FreeSeats.Count" />
 
-    <h3>Coupe: <b>2</b></h3>
-    <h4>Seat numbers reserved:<br /><b>23</b>, <b>24</b></h4>
+        <hr />
 
-    <hr />
+        <h3>Price of purchase: <b>@String.Format("{0:F2}", Model.BasePrice)</b></h3>
 
-    <h3>Price of purchase: <b>24.97 levs</b></h3>
+        <hr />
 
-    <hr />
+        <button type="submit">Purchase seats</button>
+    </div>
 
-    <p style="color:gray; font-weight:lighter; font-style: italic">
-        Receipt number: 0000001 <br />
-        Time of purchase: 11:37 06.08.2019<br />
-        Thanks for shopping with iBDZ!
-    </p>
-</div>
+</form>
 
 <script>
     var form = document.getElementById("purchase-form")
@@ -44,7 +37,15 @@
     function finalizePurchase(event) {
         event.preventDefault();
 
-        sendDataAsJSON(form.action, data,
+        let data = {
+            carId: "asdf",
+            seats: [],
+            priceLevs: 16.99
+        };
+
+        postDataAsJSON(
+            '/Seat/Reserve',
+            data,
             function () {
             })
     }

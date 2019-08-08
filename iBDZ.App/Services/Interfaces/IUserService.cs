@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace iBDZ.App.Services
+namespace iBDZ.Services
 {
 	public interface IUserService
     {

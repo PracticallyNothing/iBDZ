@@ -348,8 +348,6 @@
     function gatherTrainCars() {
         let res = [];
 
-
-
         return res;
     }
 
@@ -366,7 +364,9 @@
             TrainCars: [],
         }
 
-        sendDataAsJSON(form.action, data,
+        postDataAsJSON(
+            form.action,
+            data,
             function () {
                 let submit = document.getElementById("submit-button")
                 submit.value = "Saving..."

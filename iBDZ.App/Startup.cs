@@ -36,6 +36,7 @@ namespace iBDZ.App
 			services.AddScoped<IRouteService, RouteService>();
 			services.AddScoped<ITrainService, TrainService>();
 			services.AddScoped<ISeatService, SeatService>();
+			services.AddScoped<IUserService, UserService>();
 
 			services.AddDbContext<ApplicationDbContext>(options => {
 				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));

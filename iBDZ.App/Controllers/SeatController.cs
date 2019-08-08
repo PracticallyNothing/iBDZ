@@ -38,9 +38,9 @@ namespace iBDZ.App.Controllers
 
 		[HttpGet]
 		[Authorize]
-		public IActionResult Reserve()
+		public IActionResult Reserve(string car, string coupe)
 		{
-			return View();
+			return View(seatService.GetReservationInfo(car, coupe));
 		}
     }
 }

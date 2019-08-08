@@ -8,5 +8,6 @@ namespace iBDZ.Services
 	{
 		List<SeatSearchResultModel> FindSeats(string jsonParams);
 		string ReserveSeat(ClaimsPrincipal user, string seatId);
+		ReservationInfoModel GetReservationInfo(string car, string coupe);
 	}
 }

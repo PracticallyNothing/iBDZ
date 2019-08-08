@@ -103,8 +103,8 @@ namespace iBDZ.Services
 
 			JObject json = JObject.Parse(jsonString);
 			List<string> seats = json["seats"].Value<List<string>>();
-			
-			foreach(string SeatId in seats)
+
+			foreach (string SeatId in seats)
 			{
 				Purchase p = new Purchase()
 				{
@@ -124,6 +124,48 @@ namespace iBDZ.Services
 			db.Receipts.Add(receipt);
 			db.SaveChanges();
 			return receipt.Id;
+		}
+
+		private static decimal GetBasePrice(TrainCarType Type, TrainCarClass Class)
+		{
+			switch (Type)
+			{
+				case TrainCarType.Beds:
+					return 45.99m;
+				case TrainCarType.Compartments:
+					switch (Class)
+					{
+						case TrainCarClass.Business: return 34.99m;
+						case TrainCarClass.First: return 29.99m;
+						case TrainCarClass.Second: return 20.99m;
+					}
+					break;
+			}
+
+			return -1m;
+		}
+
+		public ReservationInfoModel GetReservationInfo(string car, string coupe)
+		{
+			List<Seat> seats =
+				db.Seats
+				.Include(x => x.Car).ThenInclude(x => x.Train)
+				.Include(x => x.Reserver)
+				.Where(x => x.Car.Id == car && x.Coupe == int.Parse(coupe))
+				.ToList();
+
+			ReservationInfoModel res = new ReservationInfoModel()
+			{
+				CarId = seats[0].Car.Id,
+				TrainId = seats[0].Car.Train.Id,
+				Class = seats[0].Car.Class,
+				Type = seats[0].Car.Type,
+				Coupe = int.Parse(coupe),
+				BasePrice = GetBasePrice(seats[0].Car.Type, seats[0].Car.Class),
+				FreeSeats = seats.Where(x => x.Reserver == null).Select(x => new Tuple<string, int>(x.Id, x.Coupe * 10 + x.SeatNumber)).ToList()
+			};
+
+			return res;
 		}
 	}
 }

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace iBDZ.App.Services
+namespace iBDZ.Services
 {
     public class UserService : IUserService
     {

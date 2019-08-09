@@ -5,23 +5,41 @@
     [ ] User control view
     [ ] User info view
 [ ] Unit testing
+[ ] Seat.Reserver automatic nullification 
+   (seats lose their reserved status if the train 
+    has reached the end of its route)
+[ ] Train availability management
+    (When a train departs, you shouldn't be able to reserve seats anymore)
+[ ] Automatic train repurposing
+    (Once a train reaches its destination, after a certain time it should
+     reappear with a new schedule and route, where the new starting station
+     matches the previous final station)
 
 ----- High Priority -----
+[ ] Purchase refunding - ability to refund in a certain time window
 [ ] Seeders:
     [ ] UserSeeder
     [ ] PurchaseSeeder
     [ ] Better RoleSeeder (SuperUser must be set (and created if doesn't exist))
     [ ] Better RouteSeeder (more routes)
-    [ ] Better TrainSeeder (better timing, possibly add Length to Route to determine this)
+    [ ] Better TrainSeeder
+        [ ] Better timing, possibly add Length to Route to determine this
 
 ----- Low Priority -----
 [ ] Make website prettier:
-    [ ] Home/Index (turn ugly links into something better-looking)
+    [ ] Home/Index (turn ugly links into something better looking)
     [ ] Account/Login
     [ ] Account/Register (add flavor text for "why you should register")
     [ ] User/Purchases
     [ ] Seat/Reserve (show seat info and allow choice)
     [ ] Train/Info (show seat info)
+
+----- Ideas -----
+[ ] Statistics
+    [ ] Train statistics
+        [ ] Model - Id, Train, Route, Number of passengers, Payout, etc.
+        [ ] View
+    [ ] Route statistics
 
 Controllers (min. 5):
 1. HomeController

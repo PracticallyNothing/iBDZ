@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using System.Globalization;
+using System.Threading;
 
 namespace iBDZ.App
 {
@@ -7,7 +9,9 @@ namespace iBDZ.App
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+			Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+			Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+			CreateWebHostBuilder(args).Build().Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>

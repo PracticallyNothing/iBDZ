@@ -27,12 +27,12 @@
     <h3>Coupe: <b>@Model.Coupe</b></h3>
     <h4>
         Seat numbers reserved:<br />
-        @String.Join(',', Model.ReservedSeatNumbers.Select(x => "<b>" + x.ToString() + "</b>"));
+        @Html.Raw(String.Join(',', Model.ReservedSeatNumbers.OrderBy(x => x).Select(x => "<b>" + x.ToString() + "</b>")))
     </h4>
 
     <hr />
 
-    <h3>Price of purchase: <b>@(String.Format("{0:.##}", Model.PriceLevs)) levs</b></h3>
+    <h3>Price of purchase: <b>@(String.Format("{0:F2}", Model.PriceLevs)) levs</b></h3>
 
     <hr />
 

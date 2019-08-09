@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using iBDZ.Data;
+
+@inject SignInManager<User> SignInManager
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -20,13 +25,17 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">iBDZ.App</a>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">iBDZ</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    <li><a href="/Home/Index">Home</a></li>
+                    <li><a href="/Train/Timetable">Timetable</a></li>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <li><a href="/Seat/Find">Find seating</a></li>
+                        <li><a href="/User/Purchases">Purchases</a></li>
+                    }
                 </ul>
                 <partial name="_LoginPartial" />
             </div>

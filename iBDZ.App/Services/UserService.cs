@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 
 namespace iBDZ.Services
 {
-    public class UserService : IUserService
-    {
+	public class UserService : IUserService
+	{
 		private readonly ApplicationDbContext db;
 
 		public UserService(ApplicationDbContext db)
@@ -21,41 +21,41 @@ namespace iBDZ.Services
 
 		public ReceiptModel GetReceipt(ClaimsPrincipal user, string rid)
 		{
-			Receipt receipt = db.Receipts.Include(x => x.Purchases).Where(x => x.Id == rid).First();	
-			
-			Purchase p = 
-				db.Purchases
-				.Include(x => x.Seat)
-					.ThenInclude(x => x.Car)
-					.ThenInclude(x => x.Train)
-					.ThenInclude(x => x.Route)
-				.Include(x => x.User)
-				.Where(x => x.User.UserName == user.Identity.Name
-				         && x.Id == receipt.Purchases[0].Id)
-				.First();
+			Receipt receipt =
+				db.Receipts
+					.Include(x => x.User)
+					.Include(x => x.Purchases)
+						.ThenInclude(x => x.Seat)
+						.ThenInclude(x => x.Car)
+						.ThenInclude(x => x.Train)
+						.ThenInclude(x => x.Route)
+					.Where(x => x.Id == rid)
+					.First();
+
+			Purchase p = receipt.Purchases[0];
 
 			ReceiptModel result = new ReceiptModel()
 			{
-				Id = p.Id,
-				
+				Id = receipt.Id,
+
 				TrainId = p.Seat.Car.Train.Id,
 				Route = p.Seat.Car.Train.Route.ToString(),
 				TimeOfDeparture = p.Seat.Car.Train.TimeOfDeparture,
 				TimeOfArrival = p.Seat.Car.Train.TimeOfArrival,
-				
+
 				CarId = p.Seat.Car.Id,
 				Type = p.Seat.Car.Type,
 				Class = p.Seat.Car.Class,
-				
+
 				Coupe = p.Seat.Coupe,
 				ReservedSeatNumbers = new List<int>(),
 
-				TimeOfPurchase = p.TimeOfPurchase,
-				PriceLevs = p.PriceLevs
+				TimeOfPurchase = receipt.TimeOfPurchase,
+				PriceLevs = receipt.PriceLevs
 			};
-			
-			foreach(Purchase purchase in db.Purchases
-			                             .Include(x => x.Receipt)
+
+			foreach (Purchase purchase in db.Purchases
+										 .Include(x => x.Receipt)
 										 .Include(x => x.Seat)
 										 .Where(x => x.Receipt == receipt)
 										 .ToList())
@@ -66,23 +66,30 @@ namespace iBDZ.Services
 			return result;
 		}
 
-		public List<ShortPurchaseModel> GetUserPurchasesList(ClaimsPrincipal user)
+		public List<ShortReceiptModel> GetUserPurchasesList(ClaimsPrincipal user)
 		{
-			List<Purchase> purchases = db.Users.Include(x => x.Purchases).Where(x => x.UserName == user.Identity.Name).Select(x => x.Purchases).First();
-			List<ShortPurchaseModel> shortPurchases = new List<ShortPurchaseModel>(purchases.Count);
+			List<Receipt> receipts =
+				db.Receipts
+					.Include(x => x.Purchases)
+						.ThenInclude(x => x.Seat)
+						.ThenInclude(x => x.Car)
+						.ThenInclude(x => x.Train)
+						.ThenInclude(x => x.Route)
+					.Where(x => x.User.UserName == user.Identity.Name)
+					.ToList();
 
-			foreach (var p in purchases)
-			{
-				shortPurchases.Add(new ShortPurchaseModel
-				{
-					Id = p.Id,
-					Route = p.Seat.Car.Train.Route.ToString(),
-					PriceLevs = p.PriceLevs,
-					TimeOfPurchase = p.TimeOfPurchase
-				});
-			}
+			List<ShortReceiptModel> shortReceipts = receipts
+					.Select(x => new ShortReceiptModel
+					{
+						Id = x.Id,
+						PriceLevs = x.PriceLevs,
+						Route = x.Purchases[0].Seat.Car.Train.Route.ToString(),
+						TimeOfPurchase = x.TimeOfPurchase,
+					})
+					.OrderBy(x => x.TimeOfPurchase)
+					.ToList();
 
-			return shortPurchases;
+			return shortReceipts;
 		}
 	}
 }

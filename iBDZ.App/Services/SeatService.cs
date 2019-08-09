@@ -50,7 +50,7 @@ namespace iBDZ.Services
 			if (ClassString == "Any")
 			{
 				filtered = db.TrainCars
-					.Include(x => x.Seats)
+					.Include(x => x.Seats).ThenInclude(x => x.Reserver)
 					.Include(x => x.Train).ThenInclude(x => x.Route)
 					.Where(x => x.Train.RouteId == RouteId
 							 && x.Type == TrainCarType)
@@ -59,7 +59,7 @@ namespace iBDZ.Services
 			else
 			{
 				filtered = db.TrainCars
-					.Include(x => x.Seats)
+					.Include(x => x.Seats).ThenInclude(x => x.Reserver)
 					.Include(x => x.Train).ThenInclude(x => x.Route)
 					.Where(x => x.Train.RouteId == RouteId
 							 && x.Type == TrainCarType
@@ -99,23 +99,28 @@ namespace iBDZ.Services
 
 		public string ReserveSeat(ClaimsPrincipal user, string jsonString)
 		{
-			Receipt receipt = new Receipt();
-
 			JObject json = JObject.Parse(jsonString);
-			List<string> seats = json["seats"].Value<List<string>>();
+			var jsonSeats = (JArray)json["seats"];
+			List<Seat> seats = new List<Seat>(jsonSeats.Count);
 
-			foreach (string SeatId in seats)
+			foreach (var j in jsonSeats)
 			{
-				Purchase p = new Purchase()
-				{
-					TimeOfPurchase = DateTime.Now,
-					PriceLevs = json["priceLevs"].Value<decimal>(),
-					User = db.Users.Where(x => x.UserName == user.Identity.Name).First(),
-					Seat = db.Seats.Find(SeatId),
-					Receipt = receipt,
-				};
+				seats.Add(
+					db.Seats.Include(x => x.Car).Where(x => x.Id == j.Value<string>()).First()
+				);
+			}
 
-				p.Seat.Reserver = p.User;
+			Receipt receipt = new Receipt()
+			{
+				User = db.Users.Where(x => x.UserName == user.Identity.Name).First(),
+				TimeOfPurchase = DateTime.Now,
+				PriceLevs = GetBasePrice(seats[0].Car.Type, seats[0].Car.Class) * jsonSeats.Count,
+			};
+
+			foreach (Seat s in seats)
+			{
+				Purchase p = new Purchase() { Seat = s, Receipt = receipt };
+				p.Seat.Reserver = receipt.User;
 
 				receipt.Purchases.Add(p);
 				db.Purchases.Add(p);
@@ -151,7 +156,7 @@ namespace iBDZ.Services
 				db.Seats
 				.Include(x => x.Car).ThenInclude(x => x.Train)
 				.Include(x => x.Reserver)
-				.Where(x => x.Car.Id == car && x.Coupe == int.Parse(coupe))
+				.Where(x => x.Car.Id.StartsWith(car) && x.Coupe == int.Parse(coupe))
 				.ToList();
 
 			ReservationInfoModel res = new ReservationInfoModel()
@@ -162,7 +167,18 @@ namespace iBDZ.Services
 				Type = seats[0].Car.Type,
 				Coupe = int.Parse(coupe),
 				BasePrice = GetBasePrice(seats[0].Car.Type, seats[0].Car.Class),
-				FreeSeats = seats.Where(x => x.Reserver == null).Select(x => new Tuple<string, int>(x.Id, x.Coupe * 10 + x.SeatNumber)).ToList()
+				SeatInfo = seats.Select(x => new ReservationSeatInfo
+				{
+					Id = x.Id,
+					SeatNumber = x.SeatNumber + x.Coupe * 10,
+					Taken = x.Reserver != null,
+				}).ToList(),
+				FreeSeats = seats.Where(x => x.Reserver == null).Select(x => new ReservationSeatInfo
+				{
+					Id = x.Id,
+					SeatNumber = x.SeatNumber + x.Coupe * 10,
+					Taken = true,
+				}).ToList(),
 			};
 
 			return res;

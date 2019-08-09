@@ -4,7 +4,7 @@ using System.Text;
 
 namespace iBDZ.Data.ViewModels
 {
-	public class ShortPurchaseModel
+	public class ShortReceiptModel
 	{
 		public string Id { get; set; }
 		public string Route { get; set; }

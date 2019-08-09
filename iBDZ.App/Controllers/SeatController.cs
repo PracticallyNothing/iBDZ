@@ -31,9 +31,11 @@ namespace iBDZ.App.Controllers
 
 		[HttpPost]
 		[Authorize]
+		[ActionName("Reserve")]
 		public IActionResult ReservePost()
 		{
-			return View(seatService.ReserveSeat(User, new StreamReader(Request.Body).ReadToEnd()));
+			string receiptId = seatService.ReserveSeat(User, new StreamReader(Request.Body).ReadToEnd());
+			return Redirect("/User/Receipt?id=" + receiptId);
 		}
 
 		[HttpGet]

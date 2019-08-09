@@ -15,22 +15,51 @@
 <br />
 <br />
 
-<div>
-    <h3 class="text-center">Train information:</h3>
-    <h3 class="text-center"><a href="/Train/Timetable">Timetable</a></h3>
+<style>
+    fieldset {
+        width: auto;
+        display: inline;
+        padding: 15px;
+    }
+
+    legend {
+        border: none;
+        width: auto;
+        margin: 0 auto;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+</style>
+
+<div class="text-center">
+    <fieldset style="border: 1px black solid;">
+        <legend>Our Services</legend>
+        <div>
+            <h3 style="">Have a look at the <a href="/Train/Timetable">Timetable</a> for information on trains.</h3>
+        </div>
+
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <div class="text-center">
+                <h3>
+                    <a href="/Seat/Find">Find seating</a> for your next trip.<br />
+                </h3>
+            </div>
+            <div class="text-center">
+                <h3>
+                    Review your <a href="/User/Purchases">purchases</a>.
+                </h3>
+            </div>
+        }
+        else
+        {
+            <hr />
+
+            <div class="text-center">
+                <h2>You don't seem to be logged in.</h2>
+                <a href="/Identity/Account/Login" class="text-primary"><h3>Click here to login.</h3></a>
+                <a href="/Identity/Account/Register" class="text-primary"><h3>Click here to register with our service.</h3></a>
+            </div>
+        }
+    </fieldset>
 </div>
-
-<br />
-
-@if (SignInManager.IsSignedIn(User))
-{
-
-}
-else
-{
-    <div class="text-justify">
-        <h2>You don't seem to be logged in.</h2>
-        <a href="/Identity/Account/Login" class="text-primary"><h3>Click here to login.</h3></a>
-        <a href="/Identity/Account/Register" class="text-primary"><h3>Click here to register with our service.</h3></a>
-    </div>
-}

@@ -7,6 +7,6 @@ namespace iBDZ.Data
 	{
 		public User() {}
 
-		public List<Purchase> Purchases { get; set; }
+		public List<Receipt> Receipts { get; set; }
 	}
 }

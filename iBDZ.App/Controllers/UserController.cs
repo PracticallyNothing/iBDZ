@@ -15,9 +15,9 @@ namespace iBDZ.App.Controllers
 		
 		[HttpGet]
 		[Authorize]
-        public IActionResult Receipt(string rid)
+        public IActionResult Receipt(string id)
         {
-            return View(userService.GetReceipt(User, rid));
+            return View(userService.GetReceipt(User, id));
         }
 
 		[HttpGet]

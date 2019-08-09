@@ -12,6 +12,13 @@ namespace iBDZ.Data
 		}
 
 		public string Id { get; set; }
+
+		public DateTime TimeOfPurchase { get; set; }
+
+		public decimal PriceLevs { get; set; }
+
+		public User User { get; set; }
+
 		public List<Purchase> Purchases { get; set; }
-    }
+	}
 }

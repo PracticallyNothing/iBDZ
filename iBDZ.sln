@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iBDZ.App", "iBDZ.App\iBDZ.A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iBDZ.Data", "iBDZ.Data\iBDZ.Data.csproj", "{A61F35D9-579F-4B38-A4FD-5DBBC1F7BA9B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iBDZ.Tests", "iBDZ.Tests\iBDZ.Tests.csproj", "{F64FBF2E-0873-4298-9162-AC05047CDFE6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{A61F35D9-579F-4B38-A4FD-5DBBC1F7BA9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A61F35D9-579F-4B38-A4FD-5DBBC1F7BA9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A61F35D9-579F-4B38-A4FD-5DBBC1F7BA9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F64FBF2E-0873-4298-9162-AC05047CDFE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F64FBF2E-0873-4298-9162-AC05047CDFE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F64FBF2E-0873-4298-9162-AC05047CDFE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F64FBF2E-0873-4298-9162-AC05047CDFE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

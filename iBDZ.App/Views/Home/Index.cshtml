@@ -12,8 +12,6 @@
 <h4 class="text-center">Your first stop for your train needs.</h4>
 
 <br />
-<br />
-<br />
 
 <style>
     fieldset {
@@ -28,54 +26,16 @@
         padding-right: 5px;
         font-size: 27pt;
     }
-</style>
 
-<div class="text-center">
-    <fieldset style="border: 1px black solid;">
-        <legend>Our Services</legend>
-        <div>
-            <h3 style="">Have a look at the <a href="/Train/Timetable">Timetable</a> for information on trains.</h3>
-        </div>
-
-        @if (SignInManager.IsSignedIn(User))
-        {
-            <div class="text-center">
-                <h3>
-                    <a href="/Seat/Find">Find seating</a> for your next trip.<br />
-                </h3>
-            </div>
-            <div class="text-center">
-                <h3>
-                    Review your <a href="/User/Purchases">purchases</a>.
-                </h3>
-            </div>
-        }
-        else
-        {
-            <hr />
-
-            <div class="text-center">
-                <h2>You don't seem to be logged in.</h2>
-                <a href="/Identity/Account/Login" class="text-primary"><h3>Click here to login.</h3></a>
-                <a href="/Identity/Account/Register" class="text-primary"><h3>Click here to register with our service.</h3></a>
-            </div>
-        }
-    </fieldset>
-</div>
-
-<br />
-
-<style>
     #TimetablePanel {
         background-image: url("images/train4.jpg")
     }
 
-    #FindSeatsPanel {
-        background-image: url("images/kupe.png");
-    }
-
-    #PurchasesPanel {
-        background-image: url("images/wallet.png");
+    .MyPanel:hover {
+        cursor: pointer;
+        filter: brightness(115%);
+        background-size: 125% 250%;
+        transition: all 0.15s ease-in;
     }
 
     .MyPanel {
@@ -93,13 +53,6 @@
         filter: brightness(50%);
     }
 
-        .MyPanel:hover {
-            cursor: pointer;
-            filter: brightness(115%);
-            background-size: 125% 250%;
-            transition: all 0.15s ease-in;
-        }
-
     .MyPanelText {
         display: inline-block;
         vertical-align: middle;
@@ -108,6 +61,29 @@
         color: white;
         padding: 7px;
         border-radius: 6px;
+    }
+
+    .MyButton:hover {
+        cursor: pointer;
+        transition: all 0.15s ease-in;
+        background-color: #eee;
+    }
+
+    .MyButton {
+        height: 80px;
+        padding-left: 30px;
+        padding-right: 30px;
+        display: inline-block;
+        width: auto;
+        border: solid 1px black;
+        text-align: center;
+        border-radius: 6px;
+        transition: all 0.15s ease-out;
+        background-color: #ccc;
+    }
+
+    hr {
+        border-top-color: #aaaaaa;
     }
 </style>
 
@@ -121,16 +97,56 @@
             </p>
         </div>
 
-        <div class="MyPanel" id="FindSeatsPanel" onclick="window.location.href = '/Seat/Find'">
-            <p class="MyPanelText">
-                Find and reserve seats for your next trip.
-            </p>
-        </div>
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <style>
+                #FindSeatsPanel {
+                    background-image: url("images/kupe.png");
+                }
 
-        <div class="MyPanel" id="PurchasesPanel" onclick="window.location.href = '/User/Purchases'">
-            <p class="MyPanelText">
-                Review your purchases.
-            </p>
-        </div>
+                #PurchasesPanel {
+                    background-image: url("images/wallet.png");
+                }
+            </style>
+
+            <div class="MyPanel" id="FindSeatsPanel" onclick="window.location.href = '/Seat/Find'">
+                <p class="MyPanelText">
+                    Find and reserve seats for your next trip.
+                </p>
+            </div>
+
+            <div class="MyPanel" id="PurchasesPanel" onclick="window.location.href = '/User/Purchases'">
+                <p class="MyPanelText">
+                    Review your purchases.
+                </p>
+            </div>
+        }
+        else
+        {
+            <hr />
+
+            <h2>You don't seem to be in your account.</h2><br />
+            <h3>You should:</h3><br />
+            <div class="MyButton" onclick="window.location.href = '/Identity/Account/Login'"><h2>Login</h2></div>
+
+            <h3>Or</h3>
+
+            <div class="MyButton" onclick="window.location.href = '/Identity/Account/Register'"><h2>Register</h2></div>
+        }
+        @if (User.IsInRole("Administrator") || User.IsInRole("SuperUser"))
+        {
+            <style>
+                #UsersPanel {
+                    background-image: url("images/users.png")
+                }
+            </style>
+            <div class="MyPanel" id="UsersPanel" onclick="window.location.href = '/Admin/Users'">
+                <p class="MyPanelText">
+                    Look at the application's users.
+                </p>
+            </div>
+
+        }
     </fieldset>
 </div>
+

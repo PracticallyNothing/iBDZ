@@ -106,7 +106,12 @@ namespace iBDZ.Services
 			foreach (var j in jsonSeats)
 			{
 				seats.Add(
-					db.Seats.Include(x => x.Car).Where(x => x.Id == j.Value<string>()).First()
+					db.Seats
+						.Include(x => x.Car)
+							.ThenInclude(x => x.Train)
+							.ThenInclude(x => x.Route)
+						.Where(x => x.Id == j.Value<string>())
+						.First()
 				);
 			}
 
@@ -115,6 +120,11 @@ namespace iBDZ.Services
 				User = db.Users.Where(x => x.UserName == user.Identity.Name).First(),
 				TimeOfPurchase = DateTime.Now,
 				PriceLevs = GetBasePrice(seats[0].Car.Type, seats[0].Car.Class) * jsonSeats.Count,
+				
+				TrainId = seats[0].Car.Train.Id,
+				Route = seats[0].Car.Train.Route.ToString(),
+				TimeOfDeparture = seats[0].Car.Train.TimeOfDeparture,
+				TimeOfArrival = seats[0].Car.Train.TimeOfArrival,
 			};
 
 			foreach (Seat s in seats)

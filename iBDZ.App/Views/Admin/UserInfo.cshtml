@@ -1,0 +1,50 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model iBDZ.Data.ViewModels.UserInfo
+
+<style>
+    #page-title { text-align: center; }
+
+    table { table-layout: fixed; }
+
+    td { text-align: center; }
+
+    .td-data {
+        font-weight: bold;
+        font-size: larger;
+    }
+
+    #car-table-title { text-align: center; }
+</style>
+
+<h1 id="page-title">Information for user<br /><b style="font-size: larger">@Model.UserName</b></h1>
+
+<table class="table">
+    <tr>
+        <td>Roles: <b>@String.Join(", ", Model.Roles)</b></td>
+    </tr>
+</table>
+
+<table class="table">
+    <thead>
+        <tr>
+            <td colspan="4">Route</td>
+            <td colspan="4">Time of purchase</td>
+            <td colspan="4">Price (lv.)</td>
+            <td colspan="1"></td>
+        </tr>
+    </thead>
+    @foreach (var purchase in Model.Purchases)
+    {
+        <tr class="clickable" onclick="showReceipt('@purchase.Id')">
+            <td colspan="4">@purchase.Route</td>
+            <td colspan="4">@purchase.TimeOfPurchase.ToString()</td>
+            <td colspan="4">@purchase.PriceLevs lv.</td>
+            <td colspan="1"><span class="glyphicon glyphicon-menu-right"></span></td>
+        </tr>
+    }
+</table>

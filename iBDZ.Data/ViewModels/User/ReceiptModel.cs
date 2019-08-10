@@ -22,5 +22,7 @@ namespace iBDZ.Data.ViewModels
 
 		public DateTime TimeOfPurchase { get; set; }
 		public decimal PriceLevs { get; set; }
+
+		public bool IsRefundable { get; set; }
     }
 }

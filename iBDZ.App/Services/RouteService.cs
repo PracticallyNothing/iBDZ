@@ -47,7 +47,7 @@ namespace iBDZ.Services
 					Route = r.ToString()
 				});
 			}
-			return result;
+			return result.OrderBy(x => x.Route).ToList();
 		}
 	}
 }

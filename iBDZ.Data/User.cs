@@ -5,7 +5,9 @@ namespace iBDZ.Data
 {
 	public class User : IdentityUser
 	{
-		public User() {}
+		public User() {
+			Receipts = new List<Receipt>();
+		}
 
 		public List<Receipt> Receipts { get; set; }
 	}

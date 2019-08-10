@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using iBDZ.Services;
 using iBDZ.App.Data.Seeders;
 using iBDZ.Data;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace iBDZ.App
 {
@@ -37,6 +39,7 @@ namespace iBDZ.App
 			services.AddScoped<ITrainService, TrainService>();
 			services.AddScoped<ISeatService, SeatService>();
 			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<IAdminService, AdminService>();
 
 			services.AddDbContext<ApplicationDbContext>(options => {
 				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
@@ -69,9 +72,13 @@ namespace iBDZ.App
 			app.UseMvcWithDefaultRoute();
 
 			RouteSeeder rs = new RouteSeeder();
-			TrainSeeder ts = new TrainSeeder();
 			rs.Seed(serviceProvider);
+
+			TrainSeeder ts = new TrainSeeder();
 			ts.Seed(serviceProvider);
+
+			RolesSeeder.AddRoles(serviceProvider);
+			RolesSeeder.AddSuperUser(serviceProvider);
 		}
 	}
 }

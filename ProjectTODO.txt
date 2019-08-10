@@ -1,9 +1,9 @@
 ----- Top Priority -----
-[ ] Admins:
+[x] Admins:
     [x] Role
-    [ ] Controller
-    [ ] User control view
-    [ ] User info view
+    [x] Controller
+    [x] User control view
+    [x] User info view
 [ ] Unit testing
 [ ] Seat.Reserver automatic nullification 
    (seats lose their reserved status if the train 
@@ -20,7 +20,7 @@
 [ ] Seeders:
     [ ] UserSeeder
     [ ] PurchaseSeeder
-    [ ] Better RoleSeeder (SuperUser must be set (and created if doesn't exist))
+    [x] Better RoleSeeder (SuperUser must be set (and created if doesn't exist))
     [ ] Better RouteSeeder (more routes)
     [ ] Better TrainSeeder
         [ ] Better timing, possibly add Length to Route to determine this
@@ -68,5 +68,5 @@ Pages (min. 10):
 8. Reserve seats
 9. View receipt
 10. View purchases
-11. Admin user control (not done yet)
+11. Admin user control
 12. User info (not done yet)

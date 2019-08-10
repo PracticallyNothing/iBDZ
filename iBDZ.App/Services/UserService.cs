@@ -27,8 +27,6 @@ namespace iBDZ.Services
 					.Include(x => x.Purchases)
 						.ThenInclude(x => x.Seat)
 						.ThenInclude(x => x.Car)
-						.ThenInclude(x => x.Train)
-						.ThenInclude(x => x.Route)
 					.Where(x => x.Id == rid)
 					.First();
 
@@ -38,10 +36,10 @@ namespace iBDZ.Services
 			{
 				Id = receipt.Id,
 
-				TrainId = p.Seat.Car.Train.Id,
-				Route = p.Seat.Car.Train.Route.ToString(),
-				TimeOfDeparture = p.Seat.Car.Train.TimeOfDeparture,
-				TimeOfArrival = p.Seat.Car.Train.TimeOfArrival,
+				TrainId = receipt.TrainId,
+				Route = receipt.Route,
+				TimeOfDeparture = receipt.TimeOfDeparture,
+				TimeOfArrival = receipt.TimeOfArrival,
 
 				CarId = p.Seat.Car.Id,
 				Type = p.Seat.Car.Type,
@@ -51,7 +49,9 @@ namespace iBDZ.Services
 				ReservedSeatNumbers = new List<int>(),
 
 				TimeOfPurchase = receipt.TimeOfPurchase,
-				PriceLevs = receipt.PriceLevs
+				PriceLevs = receipt.PriceLevs,
+
+				IsRefundable = receipt.IsRefundable
 			};
 
 			foreach (Purchase purchase in db.Purchases

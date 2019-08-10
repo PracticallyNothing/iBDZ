@@ -13,15 +13,15 @@ namespace iBDZ.App.Data.Seeders
 		public void Seed(IServiceProvider serviceProvider)
 		{
 			var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
-			if (!db.Trains.Any() && db.Routes.Any())
+			if (db.Trains.Count() < NumTrains && db.Routes.Any())
 			{
-				for (int i = 0; i < NumTrains; i++)
+				for (int i = 0; i < NumTrains - db.Trains.Count(); i++)
 				{
 					Train t = GenTrain(db);
 					db.Trains.Add(t);
-					db.SaveChanges();
 				}
 			}
+			db.SaveChanges();
 		}
 
 		public static Train GenTrain(ApplicationDbContext db) {
@@ -45,7 +45,7 @@ namespace iBDZ.App.Data.Seeders
 			return t;
 		}
 
-		private const int NumTrains = 10;
+		private const int NumTrains = 50;
 		private const int MinNumCars = 4;
 		private const int MaxNumCars = 9;
 
@@ -72,7 +72,6 @@ namespace iBDZ.App.Data.Seeders
 				FillSeats(c, db);
 				train.Cars.Add(c);
 				db.TrainCars.Add(c);
-				db.SaveChanges();
 			}
 			for (int i = 0; i < carDistributions[1]; i++)
 			{
@@ -85,7 +84,6 @@ namespace iBDZ.App.Data.Seeders
 				FillSeats(c, db);
 				train.Cars.Add(c);
 				db.TrainCars.Add(c);
-				db.SaveChanges();
 			}
 			for (int i = 0; i < carDistributions[2]; i++)
 			{
@@ -98,7 +96,6 @@ namespace iBDZ.App.Data.Seeders
 				FillSeats(c, db);
 				train.Cars.Add(c);
 				db.TrainCars.Add(c);
-				db.SaveChanges();
 			}
 		}
 
@@ -141,7 +138,6 @@ namespace iBDZ.App.Data.Seeders
 						car.Seats.Add(s);
 					}
 				}
-				db.SaveChanges();
 			}
 		}
 	}

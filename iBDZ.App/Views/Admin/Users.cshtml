@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Users";
+}
+
+@using iBDZ.Data.ViewModels
+
+@model List<ShortUserInfo>
+
+<h2 class="text-center">Users</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <td>Username</td>
+            <td>Roles</td>
+            <td>Last purchase</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr class="clickable" onclick="showUserInfo('@user.Id')">
+                <td>@user.UserName</td>
+                <td>@String.Join(", ", user.Roles)</td>
+                @if (user.LastPurchase == null)
+                {
+                    <td><em>N/A</em></td>
+                }
+                else
+                {
+                    <td>@user.LastPurchase.ToString(@"hh\:mm dd\.MM\.yyyy")</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    function showUserInfo(userId) {
+        window.location.href = "/Admin/UserInfo?id=" + userId;
+    }
+</script>

@@ -6,7 +6,7 @@ namespace iBDZ.Services
 {
 	public interface IUserService
     {
-		List<ShortReceiptModel> GetUserPurchasesList(ClaimsPrincipal user);
-		ReceiptModel GetReceipt(ClaimsPrincipal user, string rid);
+		List<ShortReceiptModel> GetUserPurchasesList(string username);
+		ReceiptModel GetReceipt(string username, string rid);
 	}
 }

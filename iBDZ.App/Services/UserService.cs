@@ -12,14 +12,14 @@ namespace iBDZ.Services
 {
 	public class UserService : IUserService
 	{
-		private readonly ApplicationDbContext db;
+		private readonly iBDZDbContext db;
 
-		public UserService(ApplicationDbContext db)
+		public UserService(iBDZDbContext db)
 		{
 			this.db = db;
 		}
 
-		public ReceiptModel GetReceipt(ClaimsPrincipal user, string rid)
+		public ReceiptModel GetReceipt(string username, string rid)
 		{
 			Receipt receipt =
 				db.Receipts
@@ -27,8 +27,12 @@ namespace iBDZ.Services
 					.Include(x => x.Purchases)
 						.ThenInclude(x => x.Seat)
 						.ThenInclude(x => x.Car)
-					.Where(x => x.Id == rid)
-					.First();
+					.FirstOrDefault(x => x.Id == rid && x.User.UserName == username);
+
+			if (receipt == null)
+			{
+				return new ReceiptModel();
+			}
 
 			Purchase p = receipt.Purchases[0];
 
@@ -66,7 +70,7 @@ namespace iBDZ.Services
 			return result;
 		}
 
-		public List<ShortReceiptModel> GetUserPurchasesList(ClaimsPrincipal user)
+		public List<ShortReceiptModel> GetUserPurchasesList(string username)
 		{
 			List<Receipt> receipts =
 				db.Receipts
@@ -75,9 +79,9 @@ namespace iBDZ.Services
 						.ThenInclude(x => x.Car)
 						.ThenInclude(x => x.Train)
 						.ThenInclude(x => x.Route)
-					.Where(x => x.User.UserName == user.Identity.Name)
+					.Where(x => x.User.UserName == username)
 					.ToList();
-
+			
 			List<ShortReceiptModel> shortReceipts = receipts
 					.Select(x => new ShortReceiptModel
 					{

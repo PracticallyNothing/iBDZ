@@ -8,9 +8,9 @@ namespace iBDZ.Services
 {
 	public class RouteService : IRouteService
 	{
-		private readonly ApplicationDbContext db;
+		private readonly iBDZDbContext db;
 
-		public RouteService(ApplicationDbContext db)
+		public RouteService(iBDZDbContext db)
 		{
 			this.db = db;
 		}
@@ -48,6 +48,11 @@ namespace iBDZ.Services
 				});
 			}
 			return result.OrderBy(x => x.Route).ToList();
+		}
+
+		public List<Route> GetRoutesStartingFrom(string station)
+		{
+			return db.Routes.Where(x => x.StartStation == station).ToList();
 		}
 	}
 }

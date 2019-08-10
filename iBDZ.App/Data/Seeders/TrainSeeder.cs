@@ -12,7 +12,7 @@ namespace iBDZ.App.Data.Seeders
 	{
 		public void Seed(IServiceProvider serviceProvider)
 		{
-			var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
+			var db = serviceProvider.GetRequiredService<iBDZDbContext>();
 			if (db.Trains.Count() < NumTrains && db.Routes.Any())
 			{
 				for (int i = 0; i < NumTrains - db.Trains.Count(); i++)
@@ -24,7 +24,7 @@ namespace iBDZ.App.Data.Seeders
 			db.SaveChanges();
 		}
 
-		public static Train GenTrain(ApplicationDbContext db) {
+		public static Train GenTrain(iBDZDbContext db) {
 			Random r = new Random();
 
 			DateTime today = DateTime.Today;
@@ -56,7 +56,7 @@ namespace iBDZ.App.Data.Seeders
 		// What relative part of all train cars will be second class?
 		private const double SecondClassDistrib = 2;
 
-		private static void FillTrainCars(int numCars, Train train, ApplicationDbContext db)
+		private static void FillTrainCars(int numCars, Train train, iBDZDbContext db)
 		{
 			RatioDistributor rd = new RatioDistributor(SecondClassDistrib, FirstClassDistrib, BedCarsDistrib);
 			var carDistributions = rd.DistributeInt(numCars);
@@ -99,7 +99,7 @@ namespace iBDZ.App.Data.Seeders
 			}
 		}
 
-		private static void FillSeats(TrainCar car, ApplicationDbContext db)
+		private static void FillSeats(TrainCar car, iBDZDbContext db)
 		{
 			// Every train car is split into nine coupes...
 			for (int i = 1; i <= 9; i++)

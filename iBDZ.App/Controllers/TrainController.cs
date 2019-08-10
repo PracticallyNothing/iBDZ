@@ -55,7 +55,10 @@ namespace iBDZ.App.Controllers
 		[Authorize(Roles = "Administrator, SuperUser")]
 		public IActionResult Edit(string id)
 		{
-			return View(trainService.GetTrainInfoFromId(id));
+			var t = trainService.GetTrainInfoFromId(id);
+			if (t == new TrainInfoModel())
+				return Redirect("/Train/Info?id=e");
+			return View(t);
 		}
 	}
 }

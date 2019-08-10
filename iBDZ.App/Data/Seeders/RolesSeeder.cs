@@ -17,14 +17,14 @@ namespace iBDZ.App.Data.Seeders
 
 		public void ClearRoles(IServiceProvider serviceProvider)
 		{
-			var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
+			var db = serviceProvider.GetRequiredService<iBDZDbContext>();
 			foreach (var r in db.Roles)
 				db.Roles.Remove(r);
 			db.SaveChanges();
 		}
 		public void ClearSuperUser(IServiceProvider serviceProvider)
 		{
-			var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
+			var db = serviceProvider.GetRequiredService<iBDZDbContext>();
 			var superUser = db.Users.FirstOrDefault(x => x.UserName == SuperUserEmail);
 			if (superUser != null)
 			{
@@ -41,7 +41,7 @@ namespace iBDZ.App.Data.Seeders
 
 		public static void AddSuperUser(IServiceProvider serviceProvider)
 		{
-			var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
+			var db = serviceProvider.GetRequiredService<iBDZDbContext>();
 			UserManager<User> userManager = serviceProvider.GetRequiredService<UserManager<User>>();
 
 			User u = new User { UserName = SuperUserEmail, Email = SuperUserEmail };
@@ -78,7 +78,7 @@ namespace iBDZ.App.Data.Seeders
 
 		public static void AddRoles(IServiceProvider serviceProvider)
 		{
-			var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
+			var db = serviceProvider.GetRequiredService<iBDZDbContext>();
 
 			if (!db.Roles.Any())
 			{

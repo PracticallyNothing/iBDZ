@@ -12,13 +12,14 @@ namespace iBDZ.Services
 {
 	public class SeatService : ISeatService
 	{
-		private readonly ApplicationDbContext db;
+		private readonly iBDZDbContext db;
 
-		public SeatService(ApplicationDbContext db)
+		public SeatService(iBDZDbContext db)
 		{
 			this.db = db;
 		}
 
+		// Not called outside of class, no protection needed.
 		private int GetCoupeSeats(TrainCar c)
 		{
 			switch (c.Type)
@@ -38,107 +39,151 @@ namespace iBDZ.Services
 			return int.MinValue;
 		}
 
+		// Protected from bad input.
 		public List<SeatSearchResultModel> FindSeats(string jsonParams)
 		{
-			JObject o = JObject.Parse(jsonParams);
-
-			string RouteId = o["RouteId"].Value<string>();
-			TrainCarType TrainCarType = Enum.Parse<TrainCarType>(o["Type"].Value<string>());
-			string ClassString = o["Class"].Value<string>().Trim();
-			List<TrainCar> filtered;
-
-			if (ClassString == "Any")
+			try
 			{
-				filtered = db.TrainCars
-					.Include(x => x.Seats).ThenInclude(x => x.Reserver)
-					.Include(x => x.Train).ThenInclude(x => x.Route)
-					.Where(x => x.Train.RouteId == RouteId
-							 && x.Type == TrainCarType)
-					.ToList();
-			}
-			else
-			{
-				filtered = db.TrainCars
-					.Include(x => x.Seats).ThenInclude(x => x.Reserver)
-					.Include(x => x.Train).ThenInclude(x => x.Route)
-					.Where(x => x.Train.RouteId == RouteId
-							 && x.Type == TrainCarType
-							 && x.Class == Enum.Parse<TrainCarClass>(ClassString))
-					.ToList();
-			}
+				JObject o = JObject.Parse(jsonParams);
 
-			List<SeatSearchResultModel> res = new List<SeatSearchResultModel>();
+				// Throws if "RouteId" is not in JSON (throws later for other errors).
+				string RouteId = o["RouteId"].Value<string>();
+				// Throws if "Type" is not allowed or not in JSON.
+				TrainCarType TrainCarType = Enum.Parse<TrainCarType>(o["Type"].Value<string>());
+				// Throws if "Class" is not in JSON.
+				string ClassString = o["Class"].Value<string>().Trim();
 
-			foreach (var c in filtered)
-			{
-				var coupeFreeSeats = c.Seats
-					.Where(x => x.Reserver == null)
-					.OrderBy(x => x.Coupe)
-					.GroupBy(x => x.Coupe)
-					.Select(x => new { Coupe = x.Key, Count = x.Count() })
-					.Where(x => x.Count >= o["NumSeats"].Value<int>())
-					.ToList();
+				List<TrainCar> filtered;
 
-				foreach (var cc in coupeFreeSeats)
+				if (ClassString == "Any")
 				{
-					res.Add(new SeatSearchResultModel()
-					{
-						TrainId = c.Train.Id,
-						CarId = c.Id.Substring(0, 4),
-						Type = c.Type.ToString(),
-						Class = c.Class.ToString(),
-						CoupeNumber = cc.Coupe,
-						FreeSeats = cc.Count,
-						MaxSeats = GetCoupeSeats(c)
-					});
+					filtered = db.TrainCars
+						.Include(x => x.Seats).ThenInclude(x => x.Reserver)
+						.Include(x => x.Train).ThenInclude(x => x.Route)
+						.Where(x => x.Train.Route.Id == RouteId
+						         && DateTime.Now < x.Train.TimeOfDeparture.AddMinutes(5)
+								 && x.Type == TrainCarType)
+						.ToList();
 				}
-			}
+				else
+				{
+					// Throws if "Class" is not allowed.
+					filtered = db.TrainCars
+						.Include(x => x.Seats).ThenInclude(x => x.Reserver)
+						.Include(x => x.Train).ThenInclude(x => x.Route)
+						.Where(x => x.Train.RouteId == RouteId
+								 && DateTime.Now < x.Train.TimeOfDeparture.AddMinutes(5)
+								 && x.Type == TrainCarType
+								 && x.Class == Enum.Parse<TrainCarClass>(ClassString))
+						.ToList();
+				}
 
-			return res;
+				List<SeatSearchResultModel> res = new List<SeatSearchResultModel>();
+
+				foreach (var c in filtered)
+				{
+					var coupeFreeSeats = c.Seats
+						.Where(x => x.Reserver == null)
+						.OrderBy(x => x.Coupe)
+						.GroupBy(x => x.Coupe)
+						.Select(x => new { Coupe = x.Key, Count = x.Count() })
+						.Where(x => x.Count >= o["NumSeats"].Value<int>())
+						.ToList();
+
+					foreach (var cc in coupeFreeSeats)
+					{
+						res.Add(new SeatSearchResultModel()
+						{
+							TrainId = c.Train.Id,
+							CarId = c.Id.Substring(0, 4),
+							Type = c.Type.ToString(),
+							Class = c.Class.ToString(),
+							CoupeNumber = cc.Coupe,
+							FreeSeats = cc.Count,
+							MaxSeats = GetCoupeSeats(c)
+						});
+					}
+				}
+
+				return res;
+			}
+			catch
+			{
+				return new List<SeatSearchResultModel>();
+			}
 		}
 
 		public string ReserveSeat(ClaimsPrincipal user, string jsonString)
 		{
-			JObject json = JObject.Parse(jsonString);
-			var jsonSeats = (JArray)json["seats"];
-			List<Seat> seats = new List<Seat>(jsonSeats.Count);
-
-			foreach (var j in jsonSeats)
+			try
 			{
-				seats.Add(
-					db.Seats
-						.Include(x => x.Car)
-							.ThenInclude(x => x.Train)
-							.ThenInclude(x => x.Route)
-						.Where(x => x.Id == j.Value<string>())
-						.First()
-				);
+				JObject json = JObject.Parse(jsonString);
+				var jsonSeats = (JArray)json["seats"];
+				List<Seat> seats = new List<Seat>(jsonSeats.Distinct().Count());
+
+				if (jsonSeats.Count() == 0 || jsonSeats.Distinct().Count() > 8)
+				{
+					throw new Exception("Too many or 0 seats requested.");
+				}
+
+				foreach (var j in jsonSeats.Distinct())
+				{
+					seats.Add(
+						db.Seats
+							.Include(x => x.Reserver)
+							.Include(x => x.Car)
+								.ThenInclude(x => x.Train)
+								.ThenInclude(x => x.Route)
+							.First(x => x.Car.Id == json["carId"].Value<string>() 
+								     && x.Id == j.Value<string>() 
+								     && x.Reserver == null)
+					);
+				}
+
+				if (seats.Count > GetCoupeSeats(seats[0].Car))
+				{
+					throw new Exception("Too many seats requested.");
+				}
+
+				if (seats.Any(x => x.Car.Id != json["carId"].Value<string>()))
+				{
+					throw new Exception("Seats are not from requested train car.");
+				}
+
+				if (!seats.All(x => x.Coupe == seats[0].Coupe))
+				{
+					throw new Exception("Seats are not from same coupe.");
+				}
+
+				Receipt receipt = new Receipt()
+				{
+					User = db.Users.Where(x => x.UserName == user.Identity.Name).First(),
+					TimeOfPurchase = DateTime.Now,
+					PriceLevs = GetBasePrice(seats[0].Car.Type, seats[0].Car.Class) * jsonSeats.Count,
+
+					TrainId = seats[0].Car.Train.Id,
+					Route = seats[0].Car.Train.Route.ToString(),
+					TimeOfDeparture = seats[0].Car.Train.TimeOfDeparture,
+					TimeOfArrival = seats[0].Car.Train.TimeOfArrival,
+				};
+
+				foreach (Seat s in seats)
+				{
+					Purchase p = new Purchase() { Seat = s, Receipt = receipt };
+					p.Seat.Reserver = receipt.User;
+
+					receipt.Purchases.Add(p);
+					db.Purchases.Add(p);
+				}
+
+				db.Receipts.Add(receipt);
+				db.SaveChanges();
+				return receipt.Id;
 			}
-
-			Receipt receipt = new Receipt()
+			catch
 			{
-				User = db.Users.Where(x => x.UserName == user.Identity.Name).First(),
-				TimeOfPurchase = DateTime.Now,
-				PriceLevs = GetBasePrice(seats[0].Car.Type, seats[0].Car.Class) * jsonSeats.Count,
-				
-				TrainId = seats[0].Car.Train.Id,
-				Route = seats[0].Car.Train.Route.ToString(),
-				TimeOfDeparture = seats[0].Car.Train.TimeOfDeparture,
-				TimeOfArrival = seats[0].Car.Train.TimeOfArrival,
-			};
-
-			foreach (Seat s in seats)
-			{
-				Purchase p = new Purchase() { Seat = s, Receipt = receipt };
-				p.Seat.Reserver = receipt.User;
-
-				receipt.Purchases.Add(p);
-				db.Purchases.Add(p);
+				return "";
 			}
-
-			db.Receipts.Add(receipt);
-			db.SaveChanges();
-			return receipt.Id;
 		}
 
 		private static decimal GetBasePrice(TrainCarType Type, TrainCarClass Class)
@@ -162,12 +207,24 @@ namespace iBDZ.Services
 
 		public ReservationInfoModel GetReservationInfo(string car, string coupe)
 		{
-			List<Seat> seats =
-				db.Seats
-				.Include(x => x.Car).ThenInclude(x => x.Train)
-				.Include(x => x.Reserver)
-				.Where(x => x.Car.Id.StartsWith(car) && x.Coupe == int.Parse(coupe))
-				.ToList();
+			List<Seat> seats;
+			try
+			{
+				seats = db.Seats
+					.Include(x => x.Car).ThenInclude(x => x.Train)
+					.Include(x => x.Reserver)
+					.Where(x => x.Car.Id.StartsWith(car) && x.Coupe == int.Parse(coupe))
+					.ToList();
+			}
+			catch
+			{
+				return new ReservationInfoModel();
+			}
+
+			if (seats.Count == 0)
+			{
+				return new ReservationInfoModel();
+			}
 
 			ReservationInfoModel res = new ReservationInfoModel()
 			{

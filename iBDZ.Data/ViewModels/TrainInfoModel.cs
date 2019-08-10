@@ -6,6 +6,25 @@ namespace iBDZ.Data.ViewModels
 {
     public class TrainInfoModel
     {
+		public TrainInfoModel() {
+			Id = "No such train";
+			RouteInfo = new RouteInfoModel()
+			{
+				RouteId = "",
+				StartStation = "Nowhere",
+				MiddleStation = "Nowhere",
+				EndStation = "Nowhere"
+			};
+			TimeOfDeparture = DateTime.Now;
+			TimeOfArrival = DateTime.Now.AddMinutes(1);
+			Delay = new DateTime();
+
+			FreeSeats = 0;
+			MaxSeats = 0;
+
+			TrainCars = new List<TrainCarInfoModel>();
+		}
+
 		public string Id { get; set; }
 
 		public TrainType Type { get; set; }

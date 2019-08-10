@@ -11,5 +11,6 @@ namespace iBDZ.Services
 		List<string> GetAllEndStations();
 		Route GetRouteFromId(string routeId);
 		List<ShortRouteModel> GetAllRoutes();
+		List<Route> GetRoutesStartingFrom(string endStation);
 	}
 }

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace iBDZ.App.Data
 {
-	public class ApplicationDbContext : IdentityDbContext<User>
+	public class iBDZDbContext : IdentityDbContext<User>
 	{
-		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+		public iBDZDbContext(DbContextOptions<iBDZDbContext> options)
 			: base(options)
 		{
 		}

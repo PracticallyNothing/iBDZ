@@ -9,7 +9,7 @@ using iBDZ.App.Data;
 
 namespace iBDZ.App.Data.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(iBDZDbContext))]
     [Migration("20190808160255_mig3")]
     partial class mig3
     {

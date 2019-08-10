@@ -9,7 +9,7 @@ namespace iBDZ.App.Data.Seeders
 	{
 		public void Seed(IServiceProvider serviceProvider)
 		{
-			var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
+			var db = serviceProvider.GetRequiredService<iBDZDbContext>();
 			if (!db.Routes.Any())
 			{
 				AddRoute(db, "Варна", "Горна Оряховица", "София");
@@ -21,7 +21,7 @@ namespace iBDZ.App.Data.Seeders
 			db.SaveChanges();
 		}
 
-		public void AddRoute(ApplicationDbContext db, string StartStation, string EndStation)
+		public void AddRoute(iBDZDbContext db, string StartStation, string EndStation)
 		{
 			db.Routes.Add(new Route
 			{
@@ -38,7 +38,7 @@ namespace iBDZ.App.Data.Seeders
 			});
 		}
 
-		public void AddRoute(ApplicationDbContext db, string StartStation, string MiddleStation, string EndStation)
+		public void AddRoute(iBDZDbContext db, string StartStation, string MiddleStation, string EndStation)
 		{
 			db.Routes.Add(new Route
 			{

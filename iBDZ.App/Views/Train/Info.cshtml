@@ -45,9 +45,6 @@
         border-bottom-color: gray;
     }
 
-    .td-title {
-    }
-
     .td-data {
         font-weight: bold;
         font-size: larger;
@@ -64,9 +61,16 @@
     <tr>
         <td colspan="3">
             <span class="td-title">Route: </span>
-            <a title="Find other trains serving this line" href="/Train/Timetable?ss=@Model.RouteInfo.StartStation&es=@Model.RouteInfo.EndStation">
+            @if (Model.RouteInfo.RouteId == "")
+            {
                 <span class="td-data">@Model.RouteInfo.ToString()</span>
-            </a>
+            }
+            else
+            {
+                <a href="/Train/Timetable?ss=@Model.RouteInfo.StartStation&es=@Model.RouteInfo.EndStation">
+                    <span class="td-data">@Model.RouteInfo.ToString()</span>
+                </a>
+            }
         </td>
         <td colspan="3">
             <span class="td-title">Train type:</span> <span class="td-data">@Model.Type.ToString()</span>
@@ -97,7 +101,6 @@
 <table class="table">
     <thead>
         <tr style="border-top: none">
-            @*<td colspan="1"></td>*@
             <td colspan="8">Type</td>
             <td colspan="8">Class</td>
             <td colspan="8">Free seats</td>
@@ -106,12 +109,10 @@
     @foreach (var c in Model.TrainCars)
     {
         <tr class="tableRow">
-            @*<td colspan="1">></td>*@
             <td colspan="8">@c.Type.ToString()</td>
             <td colspan="8">@c.Class.ToString()</td>
             <td colspan="8">@c.FreeSeats / @c.MaxSeats</td>
         </tr>
-        @*<tr id="car-info-@c.Id"></tr>*@
     }
 </table>
 
@@ -132,10 +133,10 @@
                 return;
 
             let xhr = new XMLHttpRequest();
-            xhr.open("POST", "/Train/Delete", true);
+            xhr.open("POST", "/Train/Delete?id=" + id, true);
 
             xhr.onloadstart = function () {
-                let buttons = document.getElementsByClass("disable-on-delete");
+                let buttons = document.getElementsByClassName("disable-on-delete");
                 for (let b of buttons) {
                     b.setAttribute("disabled", "");
                 }

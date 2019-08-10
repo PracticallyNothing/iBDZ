@@ -17,14 +17,19 @@ namespace iBDZ.App.Controllers
 		[Authorize]
         public IActionResult Receipt(string id)
         {
-            return View(userService.GetReceipt(User, id));
+			var receipt = userService.GetReceipt(User.Identity.Name, id);
+
+			if (receipt.Id == "")
+				return Redirect("/User/Purchases");
+			else
+				return View(receipt);
         }
 
 		[HttpGet]
 		[Authorize]
 		public IActionResult Purchases()
 		{
-			return View(userService.GetUserPurchasesList(User));
+			return View(userService.GetUserPurchasesList(User.Identity.Name));
 		}
     }
 }

@@ -12,6 +12,16 @@ namespace iBDZ.Data.ViewModels
 	
     public class ReservationInfoModel
     {
+		public ReservationInfoModel()
+		{
+			TrainId = "";
+			CarId = "";
+			Coupe = -1;
+			BasePrice = -1.99m;
+			SeatInfo = new List<ReservationSeatInfo>();
+			FreeSeats = new List<ReservationSeatInfo>();
+		}
+
 		public string TrainId { get; set; }
 
 		public string CarId { get; set; }

@@ -13,15 +13,16 @@ namespace iBDZ.Services
 {
 	public class TrainService : ITrainService
 	{
-		private readonly ApplicationDbContext db;
+		private readonly iBDZDbContext db;
 		private readonly IRouteService routeService;
 
-		public TrainService(ApplicationDbContext db, IRouteService routeService)
+		public TrainService(iBDZDbContext db, IRouteService routeService)
 		{
 			this.db = db;
 			this.routeService = routeService;
 		}
 
+		// Not called outside of class, no protection needed.
 		private int CountSeatsOnTrain(Train t)
 		{
 			return db.TrainCars
@@ -33,6 +34,7 @@ namespace iBDZ.Services
 				);
 		}
 
+		// Not called outside of class, no protection needed.
 		private int CountFreeSeatsOnTrain(Train t)
 		{
 			return db.TrainCars
@@ -44,7 +46,8 @@ namespace iBDZ.Services
 				);
 		}
 
-		public ShortTrainInfoModel GetShortTrainInfo(Train t)
+		// Not called outside of class, no protection needed.
+		private ShortTrainInfoModel GetShortTrainInfo(Train t)
 		{
 			return new ShortTrainInfoModel
 			{
@@ -58,10 +61,17 @@ namespace iBDZ.Services
 			};
 		}
 
+		// Bad input means the user won't see anything, but that isn't a security risk.
 		public Tuple<List<ShortTrainInfoModel>, string, string> GetTimetable(string start, string end)
 		{
 			List<ShortTrainInfoModel> res = new List<ShortTrainInfoModel>();
-			List<Train> trains = db.Trains.Include(x => x.Route).OrderBy(x => x.Route.ToString()).ThenBy(x => x.TimeOfDeparture).ToList();
+			List<Train> trains =
+				db.Trains
+					.Include(x => x.Route)
+					.Where(x => x.TimeOfArrival > DateTime.Now)
+					.OrderBy(x => x.Route.ToString())
+					.ThenBy(x => x.TimeOfDeparture)
+					.ToList();
 
 			if (start != "" && start != null)
 				trains = trains.Where(x => x.Route.StartStation == start).ToList();
@@ -77,12 +87,19 @@ namespace iBDZ.Services
 			return Tuple.Create(res, start, end);
 		}
 
+		// Protected from bad input.
 		public TrainInfoModel GetTrainInfoFromId(string trainId)
 		{
 			Train t = db.Trains
 				.Include(x => x.Route)
 				.Include(x => x.Cars)
-				.First(x => x.Id == trainId);
+				.FirstOrDefault(x => x.Id == trainId);
+
+			// Returns empty object on bad Id.
+			if (t == null)
+				return new TrainInfoModel();
+
+			// Errors beyond here are a result of a corrupted Db, not bad input.
 
 			TrainInfoModel result = new TrainInfoModel
 			{
@@ -134,10 +151,13 @@ namespace iBDZ.Services
 			return result;
 		}
 
-		// WARNING: Fragile. Do not give unexpected input.
-		private DateTime DecodeDate(string dateString) {
+		// Throws when date is not in correct format.
+		private DateTime DecodeDate(string dateString)
+		{
 			Regex regex = new Regex(@"^(\d{2}):(\d{2})\s*([0-3]\d)\.([01]\d)\.(\d{4,})$");
 			Match match = regex.Match(dateString);
+			if (!match.Success)
+				throw new Exception("Date is in wrong format.");
 
 			int hours = int.Parse(match.Groups[1].Value);
 			int minutes = int.Parse(match.Groups[2].Value);
@@ -149,26 +169,48 @@ namespace iBDZ.Services
 			return new DateTime(year, month, date, hours, minutes, 0);
 		}
 
+		// Protected from bad input.
 		public void EditTrain(string json)
 		{
-			JObject obj = JObject.Parse(json);
+			try
+			{
+				JObject obj = JObject.Parse(json);
 
-			Train t = db.Trains.Find(obj.GetValue("Id").Value<string>());
-			t.RouteId = obj.GetValue("RouteId").Value<string>();
-			t.TimeOfDeparture = DecodeDate(obj.GetValue("TimeOfDeparture").Value<string>());
-			t.TimeOfArrival = DecodeDate(obj.GetValue("TimeOfArrival").Value<string>());
-			t.Type = (TrainType) Enum.Parse(typeof(TrainType), obj.GetValue("Type").Value<string>());
+				// Null if train doesn't exist, access will throw.
+				Train t = db.Trains.Find(obj.GetValue("Id").Value<string>());
+				// Throws if RouteId is not valid.
+				t.Route = db.Routes.First(x => x.Id == obj.GetValue("RouteId").Value<string>());
+				// Throws if Date has incorrect format.
+				t.TimeOfDeparture = DecodeDate(obj.GetValue("TimeOfDeparture").Value<string>());
+				// Ditto.
+				t.TimeOfArrival = DecodeDate(obj.GetValue("TimeOfArrival").Value<string>());
+				// Throws if type is invalid.
+				t.Type = (TrainType)Enum.Parse(typeof(TrainType), obj.GetValue("Type").Value<string>());
 
-			db.Trains.Update(t);
-			db.SaveChanges();
+				// Throws if dates are in an incorrect order.
+				if (t.TimeOfArrival <= t.TimeOfDeparture)
+					throw new Exception("Train arrives before it departs.");
+
+				// Can't throw, but doesn't need to, since we can't get corrupted data here.
+				db.Trains.Update(t);
+				db.SaveChanges();
+			}
+			catch
+			{
+				// Ignore bad input and don't react.
+				// Any bad JSON comes from bad actors, not users.
+			}
 		}
 
+		// Protected from bad input.
 		public void DeleteTrain(string id)
 		{
-			db.Trains.Remove(db.Trains.Find(id));
+			Train t = db.Trains.Single(x => x.Id == id);
+			db.Trains.Remove(t);
 			db.SaveChanges();
 		}
 
+		// Doesn't need protection, no input is passed.
 		public string GenerateNewTrain()
 		{
 			Train t = TrainSeeder.GenTrain(db);

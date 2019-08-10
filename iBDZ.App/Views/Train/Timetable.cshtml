@@ -7,65 +7,63 @@
 @inject IRouteService RouteService
 
 <style>
-    #filterBox {
-        border: solid;
-        display: block;
-        background-color: #211f1f;
-        color: #ffffff;
-        width: 50%;
-        margin: 0 auto;
-        padding: 5px;
-        border-radius: 15px;
+    fieldset {
+        width: auto;
+        display: inline;
+        padding: 15px;
     }
 
-    .Row {
+    legend {
+        border: none;
+        width: auto;
         margin: 0 auto;
-    }
-
-    #formSubmit, select {
-        color: black;
+        padding-left: 5px;
+        padding-right: 5px;
     }
 </style>
 
-<div id="filterBox">
-    <h3>Filter:</h3>
-    <form action="/Train/Timetable" method="get">
-        <div class="Row">
-            <label for="ss">Start station:</label>
-            <select name="ss">
-                <option value=""></option>
-                @foreach (var s in RouteService.GetAllStartingStations())
-                {
-                    if (Model.Item2 == s)
+<div class="text-center">
+    <fieldset style="border: 1px black solid;">
+        <legend>Apply filter</legend>
+        <form action="/Train/Timetable" method="get">
+            <div class="Row">
+                <label for="ss">Start station:</label>
+                <select name="ss">
+                    <option value=""></option>
+                    @foreach (var s in RouteService.GetAllStartingStations())
                     {
-                        <option value="@s" selected="selected">@s</option> }
-                    else
+                        if (Model.Item2 == s)
+                        {
+                            <option value="@s" selected="selected">@s</option> }
+                        else
+                        {
+                            <option value="@s">@s</option>}
+                    }
+                </select>
+            </div>
+            <div>
+                <label for="es">End station:</label>
+                <select name="es">
+                    <option value=""></option>
+                    @foreach (var s in RouteService.GetAllEndStations())
                     {
-                        <option value="@s">@s</option>}
-                }
-            </select>
-        </div>
-
-        <div>
-            <label for="es">End station:</label>
-            <select name="es">
-                <option value=""></option>
-                @foreach (var s in RouteService.GetAllEndStations())
-                {
-                    if (Model.Item3 == s)
-                    {
-                        <option value="@s" selected="selected">@s</option> }
-                    else
-                    {
-                        <option value="@s">@s</option>}
-                }
-            </select>
-        </div>
-        <div>
-            <input id="formSubmit" type="submit" value="Search" />
-        </div>
-    </form>
+                        if (Model.Item3 == s)
+                        {
+                            <option value="@s" selected="selected">@s</option> }
+                        else
+                        {
+                            <option value="@s">@s</option>}
+                    }
+                </select>
+            </div>
+            <div>
+                <input id="formSubmit" type="submit" value="Search" />
+            </div>
+        </form>
+    </fieldset>
 </div>
+
+<hr />
 
 <script>
     function showTrainInfo(trainId) {

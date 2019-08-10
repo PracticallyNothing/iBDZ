@@ -32,6 +32,21 @@
 
 </form>
 
+@if (Model.TrainId == "")
+{
+<script>
+    var form = document.getElementById("purchase-form")
+    form.onsubmit = function (event) {
+        event.preventDefault();
+    }
+
+    let submitButton = document.getElementById("purchase-submit")
+    submitButton.setAttribute("disabled", "");
+    submitButton.innerHTML = "Can't purchase. Incorrect data"
+</script>
+}
+else
+{
 <script>
     var numSeats = document.getElementsByName("num-seats")[0]
     numSeats.onchange = function() {
@@ -45,7 +60,6 @@
     form.onsubmit = function (event) {
         event.preventDefault();
 
-        var price = document.getElementById("final-price");
         var freeSeats = [
             @Html.Raw(String.Join(',', Model.FreeSeats.Select(x => "'" + x.Id + "'").ToList()))
         ]
@@ -59,9 +73,10 @@
             '/Seat/Reserve',
             data,
             function () {
-                let submitButton = document.getElementById("purchase-submit")
+            let submitButton = document.getElementById("purchase-submit")
                 submitButton.setAttribute("disabled", "");
-                submitButton.innerHTML = "Finalizing purchase..."
+            submitButton.innerHTML = "Finalizing purchase..."
             })
     }
 </script>
+}

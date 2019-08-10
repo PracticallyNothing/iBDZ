@@ -13,6 +13,7 @@ using iBDZ.App.Data.Seeders;
 using iBDZ.Data;
 using System.Collections.Generic;
 using System.Linq;
+using iBDZ.App.Helpers;
 
 namespace iBDZ.App
 {
@@ -41,10 +42,11 @@ namespace iBDZ.App
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<IAdminService, AdminService>();
 
-			services.AddDbContext<ApplicationDbContext>(options => {
+			services.AddDbContext<iBDZDbContext>(options =>
+			{
 				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
 			});
-			services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+			services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<iBDZDbContext>();
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 		}
@@ -79,6 +81,9 @@ namespace iBDZ.App
 
 			RolesSeeder.AddRoles(serviceProvider);
 			RolesSeeder.AddSuperUser(serviceProvider);
+
+			TrainManager tm = new TrainManager(Configuration);
+			tm.Start();
 		}
 	}
 }

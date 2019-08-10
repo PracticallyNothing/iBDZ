@@ -6,7 +6,7 @@ using System.IO;
 namespace iBDZ.App.Controllers
 {
 	public class SeatController : Controller
-    {
+	{
 		private readonly ISeatService seatService;
 
 		public SeatController(ISeatService seatService)
@@ -25,9 +25,9 @@ namespace iBDZ.App.Controllers
 		[HttpGet]
 		[Authorize]
 		public IActionResult Find()
-        {
-            return View();
-        }
+		{
+			return View();
+		}
 
 		[HttpPost]
 		[Authorize]
@@ -35,7 +35,14 @@ namespace iBDZ.App.Controllers
 		public IActionResult ReservePost()
 		{
 			string receiptId = seatService.ReserveSeat(User, new StreamReader(Request.Body).ReadToEnd());
-			return Redirect("/User/Receipt?id=" + receiptId);
+			if (receiptId == "")
+			{
+				return Redirect("/Seat/Find");
+			}
+			else
+			{
+				return Redirect("/User/Receipt?id=" + receiptId);
+			}
 		}
 
 		[HttpGet]
@@ -44,5 +51,5 @@ namespace iBDZ.App.Controllers
 		{
 			return View(seatService.GetReservationInfo(car, coupe));
 		}
-    }
+	}
 }

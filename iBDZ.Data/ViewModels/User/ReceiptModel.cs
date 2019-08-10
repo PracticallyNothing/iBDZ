@@ -6,6 +6,10 @@ namespace iBDZ.Data.ViewModels
 {
     public class ReceiptModel
     {
+		public ReceiptModel() {
+			Id = "";
+		}
+
 		public string Id { get; set; }
 
 		public string TrainId { get; set; }

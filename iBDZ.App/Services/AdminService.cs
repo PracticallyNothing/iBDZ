@@ -11,11 +11,13 @@ namespace iBDZ.Services
 {
 	public class AdminService : IAdminService
 	{
-		private readonly ApplicationDbContext db;
+		private readonly iBDZDbContext db;
+		private readonly IUserService userService;
 
-		public AdminService(ApplicationDbContext db)
+		public AdminService(iBDZDbContext db, IUserService userService)
 		{
 			this.db = db;
+			this.userService = userService;
 		}
 
 		private List<string> GetRolesForUser(string userId)
@@ -57,16 +59,7 @@ namespace iBDZ.Services
 				Id = user.Id,
 				UserName = user.UserName,
 				Roles = GetRolesForUser(user.Id),
-				Purchases = user.Receipts
-					.OrderBy(y => y.TimeOfPurchase)
-					.Select(y => new ShortReceiptModel()
-					{
-						Id = y.Id,
-						PriceLevs = y.PriceLevs,
-						Route = y.Route,
-						TimeOfPurchase = y.TimeOfPurchase
-					})
-					.ToList()
+				Purchases = userService.GetUserPurchasesList(user.UserName)
 			};
 		}
 	}

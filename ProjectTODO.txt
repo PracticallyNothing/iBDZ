@@ -4,18 +4,30 @@
     [x] Controller
     [x] User control view
     [x] User info view
+[x] Stability (don't break on bad input)
+     [x] HttpGet
+        [x] /Train/Info?id=xxxxxx...
+        [x] /Train/Edit?id=xxxxxx...
+        [x] /Seat/Reserve?car=xxxx&coupe=yyyy
+        [x] /User/Receipt?id=xxxxxx...
+        [x] /Admin/UserInfo?id=xxxxxx...
+     [x] HttpPost
+        [x] /Seat/Reserve
+        [x] /Seat/Find
+        [x] /Train/Edit
+        [x] /Train/Delete (this damn thing doesn't work, but it is protected)
 [ ] Unit testing
-[ ] Seat.Reserver automatic nullification 
+
+----- High Priority -----
+[x] Seat.Reserver automatic nullification 
    (seats lose their reserved status if the train 
     has reached the end of its route)
-[ ] Train availability management
+[x] Train availability management
     (When a train departs, you shouldn't be able to reserve seats anymore)
-[ ] Automatic train repurposing
+[x] Automatic train repurposing
     (Once a train reaches its destination, after a certain time it should
      reappear with a new schedule and route, where the new starting station
      matches the previous final station)
-
------ High Priority -----
 [ ] Purchase refunding - ability to refund in a certain time window
 [ ] Seeders:
     [ ] UserSeeder

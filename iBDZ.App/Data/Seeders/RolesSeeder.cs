@@ -46,13 +46,16 @@ namespace iBDZ.App.Data.Seeders
 			UserManager<User> userManager = serviceProvider.GetRequiredService<UserManager<User>>();
 
 			User u = new User { UserName = SuperUserEmail, Email = SuperUserEmail };
-			User userSearch = db.Users.Where(x => x.UserName == u.UserName).FirstOrDefault();
+			User userSearch = db.Users.FirstOrDefault(x => x.UserName == u.UserName);
 
 			if (userSearch == null)
 			{
-				var res = userManager.CreateAsync(u, SuperUserPassword);
-				res.Wait();
-				db.Users.Add(u);
+				try
+				{
+					var res = userManager.CreateAsync(u, SuperUserPassword);
+					res.Wait();
+					db.Users.Add(u);
+				} catch { }
 			}
 			else
 			{

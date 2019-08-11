@@ -25,6 +25,7 @@ namespace iBDZ.Data
 		/// <param name="other">TrainCar to copy</param>
 		public TrainCar(TrainCar other)
 		{
+			Seats = new List<Seat>();
 			this.Class = other.Class;
 			this.Type = other.Type;
 		}

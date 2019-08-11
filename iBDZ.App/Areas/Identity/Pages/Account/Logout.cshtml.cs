@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace iBDZ.App.Areas.Identity.Pages.Account
 {
-    [AllowAnonymous]
+    [Authorize]
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<User> _signInManager;
@@ -33,7 +33,7 @@ namespace iBDZ.App.Areas.Identity.Pages.Account
             _logger.LogInformation("User logged out.");
             if (returnUrl != null)
             {
-                return LocalRedirect(/*returnUrl*/"/Home/Index");
+                return LocalRedirect("/Home/Index");
             }
             else
             {

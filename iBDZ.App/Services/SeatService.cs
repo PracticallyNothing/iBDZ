@@ -95,6 +95,10 @@ namespace iBDZ.Services
 						res.Add(new SeatSearchResultModel()
 						{
 							TrainId = c.Train.Id,
+							TimeOfDeparture = c.Train.TimeOfDeparture.ToString(@"HH\:mm"),
+							TimeOfArrival = c.Train.TimeOfArrival.ToString(@"HH\:mm"),
+							Delay = FormatDelay(c.Train.Delay),
+							Date = c.Train.TimeOfDeparture.ToString(@"dd\.MM\.yyyy"),
 							CarId = c.Id.Substring(0, 4),
 							Type = c.Type.ToString(),
 							Class = c.Class.ToString(),
@@ -105,12 +109,23 @@ namespace iBDZ.Services
 					}
 				}
 
-				return res;
+				return res
+					.OrderBy(x => x.TrainId)
+					.ThenBy(x => x.Class.ToString())
+					.ToList();
 			}
 			catch
 			{
 				return new List<SeatSearchResultModel>();
 			}
+		}
+
+		private string FormatDelay(DateTime delay)
+		{
+			if (delay.Ticks == 0)
+				return "";
+			else
+				return " <span style=\"color: red\">+" + delay.ToString(@"mm\:ss") + "</span>";
 		}
 
 		public string ReserveSeat(ClaimsPrincipal user, string jsonString)

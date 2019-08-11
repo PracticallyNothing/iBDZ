@@ -42,7 +42,6 @@
     @if (userManager.IsInRoleAsync(userManager.GetUserAsync(User).Result, "SuperUser").Result
      && userManager.GetUserId(User) != Model.Id)
     {
-
         <tr>
             <td>
                 <script>

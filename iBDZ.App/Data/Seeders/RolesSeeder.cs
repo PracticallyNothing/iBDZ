@@ -22,6 +22,7 @@ namespace iBDZ.App.Data.Seeders
 				db.Roles.Remove(r);
 			db.SaveChanges();
 		}
+
 		public void ClearSuperUser(IServiceProvider serviceProvider)
 		{
 			var db = serviceProvider.GetRequiredService<iBDZDbContext>();

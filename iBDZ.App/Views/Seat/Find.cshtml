@@ -26,7 +26,7 @@
 
     <div class="text-center">
         <label for="select-type">Type:</label>
-        <select id="select-type">
+        <select id="select-type" onchange="updateType()">
             @foreach (TrainCarType t in Enum.GetValues(typeof(TrainCarType)))
             {
                 <option value="@t.ToString()">@t.ToString()</option>
@@ -34,9 +34,9 @@
         </select>
     </div>
 
-    <div class="text-center">
+    <div class="text-center" id="select-class-div">
         <label for="select-class">Class:</label>
-        <select id="select-class">
+        <select id="select-class" onchange="updateClass()">
             <option value="Any">Any</option>
             @foreach (TrainCarClass c in Enum.GetValues(typeof(TrainCarClass)))
             {
@@ -46,7 +46,7 @@
     </div>
 
     <div class="text-center">
-        <label for="num-seats">Number of seats:</label>
+        <label id="num-seats-label" for="num-seats">Number of seats:</label>
         <input id="num-seats" type="number" value="1" min="1" max="8" />
     </div>
 
@@ -74,6 +74,34 @@
 
     function clearResults() {
         document.getElementById("results-body").innerHTML = "";
+    }
+
+    function updateClass() {
+        let trainCarClass = document.getElementById("select-class").value;
+        let numSeatsInput = document.getElementById("num-seats");
+
+        if (trainCarClass == 'Business' || trainCarClass == 'First') {
+            numSeatsInput.setAttribute("max", "6");
+        } else {
+            numSeatsInput.setAttribute("max", "8");
+        }
+    }
+
+    function updateType() {
+        let type = document.getElementById("select-type").value;
+        let classSelectDiv = document.getElementById("select-class-div");
+        let numSeatsLabel = document.getElementById("num-seats-label");
+        let numSeatsInput = document.getElementById("num-seats");
+
+        if (type == '@iBDZ.Data.TrainCarType.Beds.ToString()') {
+            classSelectDiv.setAttribute("style", "display:none;");
+            numSeatsLabel.innerHTML = "Number of beds";
+            numSeatsInput.setAttribute("max", "3");
+        } else {
+            classSelectDiv.setAttribute("style", "");
+            numSeatsLabel.innerHTML = "Number of seats";
+            updateClass();
+        }
     }
 
     function populateResults(results) {

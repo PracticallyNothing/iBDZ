@@ -27,14 +27,6 @@ namespace iBDZ.App.Controllers
 			return View(trainService.GetTrainInfoFromId(id));
 		}
 
-		[HttpPost]
-		[Authorize(Roles = "Administrator, SuperUser")]
-		public IActionResult Delete(string id)
-		{
-			trainService.DeleteTrain(id);
-			return Redirect("/Train/Timetable");
-		}
-
 		[HttpGet]
 		[Authorize(Roles = "Administrator, SuperUser")]
 		public IActionResult New()
@@ -47,8 +39,8 @@ namespace iBDZ.App.Controllers
 		[Authorize(Roles = "Administrator, SuperUser")]
 		public IActionResult Edit()
 		{
-			trainService.EditTrain(new StreamReader(Request.Body).ReadToEnd());
-			return Redirect("/Train/Timetable");
+			string id = trainService.EditTrain(new StreamReader(Request.Body).ReadToEnd());
+			return Redirect("/Train/Info?id=" + id);
 		}
 
 		[HttpGet]

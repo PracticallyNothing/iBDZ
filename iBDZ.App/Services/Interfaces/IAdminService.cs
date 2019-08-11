@@ -7,5 +7,7 @@ namespace iBDZ.Services
     {
 		List<ShortUserInfo> GetAllUsers();
 		UserInfo GetUserInfo(string userId);
-    }
+		void PromoteUser(string userId);
+		void DemoteUser(string userId);
+	}
 }

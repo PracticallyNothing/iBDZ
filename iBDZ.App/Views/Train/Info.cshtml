@@ -14,24 +14,11 @@
         text-align: center;
     }
 
-    .tableRow:hover {
-        background-color: #bababa;
-        cursor: pointer;
-    }
-
-    .tableRow:active {
-        background-color: #989898;
-        cursor: pointer;
-    }
-
     #train-id {
         font-weight: bold;
         font-size: larger;
     }
 
-    table {
-        table-layout: fixed;
-    }
 
     td {
         text-align: center;
@@ -59,7 +46,7 @@
 
 <table class="table">
     <tr>
-        <td colspan="3">
+        <td colspan="4">
             <span class="td-title">Route: </span>
             @if (Model.RouteInfo.RouteId == "")
             {
@@ -72,12 +59,17 @@
                 </a>
             }
         </td>
-        <td colspan="3">
+        <td colspan="4">
             <span class="td-title">Train type:</span> <span class="td-data">@Model.Type.ToString()</span>
         </td>
     </tr>
 
     <tr>
+        <td colspan="2">
+            <span class="td-title">Date:</span><br />
+            <span class="td-data">@Model.TimeOfDeparture.ToString(@"dd\.MM\.yyyy")</span>
+        </td>
+
         <td colspan="2">
             <span class="td-title">Departs at:</span><br />
             <span class="td-data">@Model.TimeOfDeparture.ToShortTimeString()</span>
@@ -106,7 +98,7 @@
             <td colspan="8">Free seats</td>
         </tr>
     </thead>
-    @foreach (var c in Model.TrainCars)
+    @foreach (var c in Model.TrainCars.OrderBy(x => x.Type.ToString()).ThenBy(x => x.Class.ToString()))
     {
         <tr class="tableRow">
             <td colspan="8">@c.Type.ToString()</td>
@@ -123,37 +115,18 @@
         function newTrain() {
             window.location.href = '/Train/New';
         }
-
-        function editTrain(id) {
-            window.location.href = '/Train/Edit?id=' + id;
-        }
-
-        function deleteTrain(id) {
-            if (!confirm('Are you sure you want to delete this train?'))
-                return;
-
-            let xhr = new XMLHttpRequest();
-            xhr.open("POST", "/Train/Delete?id=" + id, true);
-
-            xhr.onloadstart = function () {
-                let buttons = document.getElementsByClassName("disable-on-delete");
-                for (let b of buttons) {
-                    b.setAttribute("disabled", "");
-                }
-                document.getElementById("delete-button").innerHTML = "Deleting..."
-            }
-
-            xhr.onloadend = function () {
-                window.location.href = xhr.responseURL;
-            }
-
-            xhr.send();
-        }
     </script>
-
     <div class="text-center">
-        <button type="button" class="disable-on-delete" id="new-button" onclick="newTrain()">New</button>
-        <button type="button" class="disable-on-delete" id="edit-button" onclick="editTrain('@Model.Id')">Edit</button>
-        <button type="button" class="disable-on-delete" id="delete-button" onclick="deleteTrain('@Model.Id')">Delete</button>
+        <button type="button" onclick="newTrain()">New</button>
+        @if (Model.RouteInfo.RouteId != "")
+        {
+            <script>
+                function editTrain(id) {
+                    window.location.href = '/Train/Edit?id=' + id;
+                }
+            </script>
+
+            <button type="button" onclick="editTrain('@Model.Id')">Edit</button>
+        }
     </div>
 }

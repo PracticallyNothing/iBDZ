@@ -15,6 +15,22 @@ namespace iBDZ.App.Controllers
 			this.userService = userService;
 		}
 
+		[HttpPost]
+		[Authorize(Roles = "SuperUser")]
+		public IActionResult Promote(string id)
+		{
+			adminService.PromoteUser(id);
+			return Redirect("/Admin/UserInfo?id=" + id);
+		}
+
+		[HttpPost]
+		[Authorize(Roles = "SuperUser")]
+		public IActionResult Demote(string id)
+		{
+			adminService.DemoteUser(id);
+			return Redirect("/Admin/UserInfo?id=" + id);
+		}
+
 		[HttpGet]
 		[Authorize(Roles = "Administrator, SuperUser")]
         public IActionResult Users()

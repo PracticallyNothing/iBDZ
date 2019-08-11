@@ -14,31 +14,53 @@
 
     <h2>Train ID: <br /><b>@Model.TrainId</b></h2>
     <h4>On route: <b>@Model.Route</b></h4>
+    <h4>Date: <b>@Model.TimeOfDeparture.ToString(@"dd\.MM\.yyyy")</b></h4>
     <h4>Departs at: <b>@Model.TimeOfDeparture.ToShortTimeString()</b> | Arrives at: <b>@Model.TimeOfArrival.ToShortTimeString()</b></h4>
 
     <hr />
 
-    <h3>Train Car ID: <b>@Model.CarId</b></h3>
+    <h3>Train car:<br /><b>@Model.CarId</b></h3>
     <h4>Type: <b>@Model.Type.ToString()</b></h4>
-    <h4>Class: <b>@Model.Class.ToString()</b></h4>
+    @if (Model.Type == iBDZ.Data.TrainCarType.Compartments)
+    {
+        <h4>Class: <b>@Model.Class.ToString()</b></h4>
+    }
 
     <hr />
 
-    <h3>Coupe: <b>@Model.Coupe</b></h3>
+    <h3>Coupe:<br /><b>@Model.Coupe</b></h3>
     <h4>
-        Seat numbers reserved:<br />
+        @(Model.Type == iBDZ.Data.TrainCarType.Compartments ? "Seat numbers" : "Beds") reserved:<br />
         @Html.Raw(String.Join(',', Model.ReservedSeatNumbers.OrderBy(x => x).Select(x => "<b>" + x.ToString() + "</b>")))
     </h4>
 
     <hr />
 
-    <h3>Price of purchase: <b>@(String.Format("{0:F2}", Model.PriceLevs)) levs</b></h3>
+    <h3>Price of purchase:<br /><b>@(String.Format("{0:F2}", Model.PriceLevs)) levs</b></h3>
 
     <hr />
 
     <p style="color:gray; font-weight:lighter; font-style: italic">
         Receipt id: @Model.Id<br />
-        Time of purchase: @Model.TimeOfPurchase.ToString(@"hh\:mm dd\.MM\.yyyy")<br />
+        Time of purchase: @Model.TimeOfPurchase.ToString(@"HH\:mm dd\.MM\.yyyy")<br />
         Thanks for shopping with iBDZ!
     </p>
+
+    @if (Model.IsRefundable && User.Identity.Name == Model.UserName)
+    {
+        <hr />
+
+        <script>
+            function refund() {
+                postDataAsJSON('/User/Refund?id=@Model.Id', {}, function () {
+                    let refundButton = document.getElementById('refund-button')
+                    refundButton.innerHTML = "Refunding..."
+                    refundButton.setAttribute("disabled", "")
+                })
+            }
+        </script>
+
+        <h4>This purchase may be refunded.</h4>
+        <button type="button" id="refund-button" onclick="refund()">Refund</button>
+    }
 </div>

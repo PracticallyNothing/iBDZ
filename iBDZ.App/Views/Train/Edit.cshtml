@@ -51,90 +51,38 @@
 </style>
 
 
-<h1 id="page-title">Editing train: <br /><span id="train-id">@Model.Id</span></h1>
+@if (Model.RouteInfo.RouteId != "")
+{
+    <h1 id="page-title">Editing train: <br /><span id="train-id">@Model.Id</span></h1>
 
-<form action="/Train/Edit" method="post" id="train-edit-form">
-    <table class="table">
-        <tr>
-            <td colspan="3">
-                <span class="td-title">Route: </span>
-                <select id="route-select" name="r" onchange="updateRoute()">
-                    @foreach (var r in RouteService.GetAllRoutes())
-                    {
-                        @if (Model.RouteInfo.RouteId == r.Id)
+    <form action="/Train/Edit" method="post" id="train-edit-form">
+        <table class="table">
+            <tr>
+                <td colspan="3">
+                    <span class="td-title">Route: </span>
+                    <select id="route-select" name="r" onchange="updateRoute()">
+                        @foreach (var r in RouteService.GetAllRoutes())
                         {
-                            <option value="@r.Id" selected="selected">@r.Route</option>
-                        }
-                        else
-                        {
-                            <option value="@r.Id">@r.Route</option>
-                        }
-                    }
-                </select>
-                <button id="undo-route" class="undo-button" type="button" onclick="resetRoute()">Undo</button>
-            </td>
-            <td colspan="3">
-                <span class="td-title">Train type:</span>
-                <select id="traintype-select" name="tt" onchange="updateTrainType()">
-                    @foreach (TrainType e in Enum.GetValues(typeof(TrainType)))
-                    {
-                        if (Model.Type == e)
-                        {
-                            <option value="@e.ToString()" selected="selected">@e.ToString()</option>
-                        }
-                        else
-                        {
-                            <option value="@e.ToString()">@e.ToString()</option>
-                        }
-                    }
-                </select>
-                <button id="undo-traintype" class="undo-button" type="button" onclick="resetTrainType()">Undo</button>
-            </td>
-        </tr>
-
-        <tr>
-            <td colspan="2">
-                <span class="td-title">Departs at:</span><br />
-                <input type="datetime" onchange="updateTravelTime()" value="@Model.TimeOfDeparture.ToString(@"hh\:mm dd\.MM\.yyyy")" name="tod" />
-                <button id="undo1" class="undo-button" type="button" onclick="resetDeparture()">Undo</button>
-            </td>
-
-            <td colspan="2">
-                <span class="td-title">Arrives at:</span><br />
-                <input type="datetime" onchange="updateTravelTime()" value="@Model.TimeOfArrival.ToString(@"hh\:mm dd\.MM\.yyyy")" name="toa" />
-                <button id="undo2" class="undo-button" type="button" onclick="resetArrival()">Undo</button>
-            </td>
-
-            <td colspan="2">
-                <span class="td-title">Travel time:</span><br />
-                <span class="td-data" id="travel-time">@((Model.TimeOfArrival - Model.TimeOfDeparture).ToString(@"hh\:mm"))</span>
-            </td>
-        </tr>
-    </table>
-
-
-    <h2 id="car-table-title">Car info:</h2>
-
-    <table class="table">
-        <thead>
-            <tr style="border-top: none">
-                <td colspan="1"></td>
-                <td colspan="8">Type</td>
-                <td colspan="8">Class</td>
-                <td colspan="8">Free seats</td>
-            </tr>
-        </thead>
-        @foreach (var c in Model.TrainCars)
-        {
-            <tr id="car-@c.Id">
-                <td colspan="1" class="clickable" onclick="deleteCar('@c.Id')"><span class="glyphicon glyphicon-remove"></span></td>
-                <td colspan="8">
-                    <select id="car-type-@c.Id" onchange="updateCarType('@c.Id', '@c.Type.ToString()')">
-                        @foreach (TrainCarType e in Enum.GetValues(typeof(TrainCarType)))
-                        {
-                            if (c.Type == e)
+                            @if (Model.RouteInfo.RouteId == r.Id)
                             {
-                                <option selected="selected" value="@e.ToString()">@e.ToString()</option>
+                                <option value="@r.Id" selected="selected">@r.Route</option>
+                            }
+                            else
+                            {
+                                <option value="@r.Id">@r.Route</option>
+                            }
+                        }
+                    </select>
+                    <button id="undo-route" class="undo-button" type="button" onclick="resetRoute()">Undo</button>
+                </td>
+                <td colspan="3">
+                    <span class="td-title">Train type:</span>
+                    <select id="traintype-select" name="tt" onchange="updateTrainType()">
+                        @foreach (TrainType e in Enum.GetValues(typeof(TrainType)))
+                        {
+                            if (Model.Type == e)
+                            {
+                                <option value="@e.ToString()" selected="selected">@e.ToString()</option>
                             }
                             else
                             {
@@ -142,50 +90,104 @@
                             }
                         }
                     </select>
-                    <button id="undo-type-@c.Id" class="undo-button" type="button" onclick="resetCarType('@c.Id', '@c.Type.ToString()')">Undo</button>
+                    <button id="undo-traintype" class="undo-button" type="button" onclick="resetTrainType()">Undo</button>
                 </td>
-                <td colspan="8">
-                    <select id="car-class-@c.Id" onchange="updateCarClass('@c.Id', '@c.Class.ToString()')">
-                        @foreach (TrainCarClass cc in Enum.GetValues(typeof(TrainCarClass)))
-                        {
-                            if (c.Class == cc)
-                            {
-                                <option selected="selected" value="@cc.ToString()">@cc.ToString()</option>
-                            }
-                            else
-                            {
-                                <option value="@cc.ToString()">@cc.ToString()</option>
-                            }
-                        }
-                    </select>
-                    <button id="undo-class-@c.Id" class="undo-button" type="button" onclick="resetCarClass('@c.Id', '@c.Class.ToString()')">Undo</button>
+            </tr>
+
+            <tr>
+                <td colspan="2">
+                    <span class="td-title">Departs at:</span><br />
+                    <input type="datetime" onchange="updateTravelTime()" value="@Model.TimeOfDeparture.ToString(@"HH\:mm dd\.MM\.yyyy")" name="tod" />
+                    <button id="undo1" class="undo-button" type="button" onclick="resetDeparture()">Undo</button>
                 </td>
-                <td colspan="8">@c.FreeSeats / @c.MaxSeats</td>
-            </tr>
-            <tr id="car-undo-@c.Id" class="clickable" style="display:none" onclick="undeleteCar('@c.Id')">
-                <td colspan="25"><span class="glyphicon glyphicon-repeat"></span></td>
-            </tr>
-        }
-        <tr>
-            <td colspan="25" class="clickable" onclick="createTrainCar()"><span class="glyphicon glyphicon-plus"></span></td>
-        </tr>
-    </table>
 
-    <div class="text-center">
-        <input id="submit-button" type="submit" value="Save changes" />
-    </div>
-</form>
+                <td colspan="2">
+                    <span class="td-title">Arrives at:</span><br />
+                    <input type="datetime" onchange="updateTravelTime()" value="@Model.TimeOfArrival.ToString(@"HH\:mm dd\.MM\.yyyy")" name="toa" />
+                    <button id="undo2" class="undo-button" type="button" onclick="resetArrival()">Undo</button>
+                </td>
 
-<script>
+                <td colspan="2">
+                    <span class="td-title">Travel time:</span><br />
+                    <span class="td-data" id="travel-time">@((Model.TimeOfArrival - Model.TimeOfDeparture).ToString(@"hh\:mm"))</span>
+                </td>
+            </tr>
+        </table>
+
+
+        <h2 id="car-table-title">Car info:</h2>
+
+        <table class="table">
+            <thead>
+                <tr style="border-top: none">
+                    <td colspan="1"></td>
+                    <td colspan="8">Type</td>
+                    <td colspan="8">Class</td>
+                    <td colspan="8">Free seats</td>
+                </tr>
+            </thead>
+            @foreach (var c in Model.TrainCars)
+            {
+                <tr id="car-@c.Id">
+                    <td colspan="1" class="clickable" onclick="deleteCar('@c.Id')"><span class="glyphicon glyphicon-remove"></span></td>
+                    <td colspan="8">
+                        <select id="car-type-@c.Id" onchange="updateCarType('@c.Id', '@c.Type.ToString()')">
+                            @foreach (TrainCarType e in Enum.GetValues(typeof(TrainCarType)))
+                            {
+                                if (c.Type == e)
+                                {
+                                    <option selected="selected" value="@e.ToString()">@e.ToString()</option>
+                                }
+                                else
+                                {
+                                    <option value="@e.ToString()">@e.ToString()</option>
+                                }
+                            }
+                        </select>
+                        <button id="undo-type-@c.Id" class="undo-button" type="button" onclick="resetCarType('@c.Id', '@c.Type.ToString()')">Undo</button>
+                    </td>
+                    <td colspan="8">
+                        <select id="car-class-@c.Id" onchange="updateCarClass('@c.Id', '@c.Class.ToString()')">
+                            @foreach (TrainCarClass cc in Enum.GetValues(typeof(TrainCarClass)))
+                            {
+                                if (c.Class == cc)
+                                {
+                                    <option selected="selected" value="@cc.ToString()">@cc.ToString()</option>
+                                }
+                                else
+                                {
+                                    <option value="@cc.ToString()">@cc.ToString()</option>
+                                }
+                            }
+                        </select>
+                        <button id="undo-class-@c.Id" class="undo-button" type="button" onclick="resetCarClass('@c.Id', '@c.Class.ToString()')">Undo</button>
+                    </td>
+                    <td colspan="8">@c.FreeSeats / @c.MaxSeats</td>
+                </tr>
+                <tr id="car-undo-@c.Id" class="clickable" style="display:none" onclick="undeleteCar('@c.Id')">
+                    <td colspan="25"><span class="glyphicon glyphicon-repeat"></span></td>
+                </tr>
+            }
+            <tr>
+                <td colspan="25" class="clickable" onclick="createTrainCar()"><span class="glyphicon glyphicon-plus"></span></td>
+            </tr>
+        </table>
+
+        <div class="text-center">
+            <input id="submit-button" type="submit" value="Save changes" />
+        </div>
+    </form>
+
+    <script>
     'use strict';
 
     function resetArrival() {
-        document.getElementsByName("toa")[0].value = "@Model.TimeOfArrival.ToString(@"hh\:mm dd\.MM\.yyyy")"
+        document.getElementsByName("toa")[0].value = "@Model.TimeOfArrival.ToString(@"HH\:mm dd\.MM\.yyyy")"
         updateTravelTime();
     }
 
     function resetDeparture() {
-        document.getElementsByName("tod")[0].value = "@Model.TimeOfDeparture.ToString(@"hh\:mm dd\.MM\.yyyy")"
+        document.getElementsByName("tod")[0].value = "@Model.TimeOfDeparture.ToString(@"HH\:mm dd\.MM\.yyyy")"
         updateTravelTime();
     }
 
@@ -202,13 +204,13 @@
         var departs = document.getElementsByName("tod")[0]
         var arrives = document.getElementsByName("toa")[0]
 
-        if (departs.value != "@Model.TimeOfDeparture.ToString(@"hh\:mm dd\.MM\.yyyy")") {
+        if (departs.value != "@Model.TimeOfDeparture.ToString(@"HH\:mm dd\.MM\.yyyy")") {
             document.getElementById("undo1").className = "";
         } else {
             document.getElementById("undo1").className = "undo-button";
         }
 
-        if (arrives.value != "@Model.TimeOfArrival.ToString(@"hh\:mm dd\.MM\.yyyy")") {
+        if (arrives.value != "@Model.TimeOfArrival.ToString(@"HH\:mm dd\.MM\.yyyy")") {
             document.getElementById("undo2").className = "";
         } else {
             document.getElementById("undo2").className = "undo-button";
@@ -373,4 +375,10 @@
                 submit.setAttribute("disabled", "");
             })
     }
-</script>
+    </script>
+}
+else
+{
+    <h2 class="MyError MyCentered">You are trying to edit a train that doesn't exits.</h2>
+    <h3 class="MyCentered">Check the id in the address bar for any errors.</h3>
+}

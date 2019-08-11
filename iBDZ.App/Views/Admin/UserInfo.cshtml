@@ -1,24 +1,36 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "User info";
 }
 
-@model iBDZ.Data.ViewModels.UserInfo
+@using Microsoft.AspNetCore.Identity
+@using iBDZ.Data
+@using iBDZ.Data.ViewModels
+
+@inject UserManager<User> userManager
+
+@model UserInfo
 
 <style>
-    #page-title { text-align: center; }
+    #page-title {
+        text-align: center;
+    }
 
-    table { table-layout: fixed; }
+    table {
+        table-layout: fixed;
+    }
 
-    td { text-align: center; }
+    td {
+        text-align: center;
+    }
 
     .td-data {
         font-weight: bold;
         font-size: larger;
     }
 
-    #car-table-title { text-align: center; }
+    #car-table-title {
+        text-align: center;
+    }
 </style>
 
 <h1 id="page-title">Information for user<br /><b style="font-size: larger">@Model.UserName</b></h1>
@@ -27,6 +39,43 @@
     <tr>
         <td>Roles: <b>@String.Join(", ", Model.Roles)</b></td>
     </tr>
+    @if (userManager.IsInRoleAsync(userManager.GetUserAsync(User).Result, "SuperUser").Result
+     && userManager.GetUserId(User) != Model.Id)
+    {
+
+        <tr>
+            <td>
+                <script>
+                    function promoteUser() {
+                        let userId = '@Model.Id';
+                        postDataAsJSON("/Admin/Promote?id=" + userId, {}, function () {
+                            let promoteButton = document.getElementById('promote-button')
+                            promoteButton.setAttribute("disabled", "");
+                            promoteButton.innerHTML = "Promoting..."
+                        })
+                    }
+
+                    function demoteUser() {
+                        let userId = '@Model.Id';
+                        postDataAsJSON("/Admin/Demote?id=" + userId, {}, function () {
+                            let demoteButton = document.getElementById('demote-button')
+                            demoteButton.setAttribute("disabled", "");
+                            demoteButton.innerHTML = "Demoting..."
+                        })
+                    }
+                </script>
+
+                @if (!userManager.IsInRoleAsync(userManager.FindByIdAsync(Model.Id).Result, "Administrator").Result)
+                {
+                    <button id="promote-button" type="button" onclick="promoteUser()">Promote to Administrator</button>
+                }
+                else
+                {
+                    <button id="demote-button" type="button" onclick="demoteUser()">Demote to User</button>
+                }
+            </td>
+        </tr>
+    }
 </table>
 
 <script>
@@ -34,6 +83,10 @@
         window.location.href = '/Admin/ViewReceipt?username=@Model.UserName&id=' + id;
     }
 </script>
+
+<div class="text-center">
+    <h3>Purchases</h3>
+</div>
 
 <table class="table">
     <thead>

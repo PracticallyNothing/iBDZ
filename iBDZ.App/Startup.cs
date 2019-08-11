@@ -67,23 +67,19 @@ namespace iBDZ.App
 
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
-			app.UseCookiePolicy();
 
 			app.UseAuthentication();
 
 			app.UseMvcWithDefaultRoute();
 
-			RouteSeeder rs = new RouteSeeder();
-			rs.Seed(serviceProvider);
+			TrainSeeder trainSeeder = new TrainSeeder(); trainSeeder.Seed(serviceProvider);
 
-			TrainSeeder ts = new TrainSeeder();
-			ts.Seed(serviceProvider);
-
+			RouteSeeder.AddRoutes(serviceProvider);
+			TrainSeeder.AddTrains(serviceProvider);
 			RolesSeeder.AddRoles(serviceProvider);
 			RolesSeeder.AddSuperUser(serviceProvider);
 
-			TrainManager tm = new TrainManager(Configuration);
-			tm.Start();
+			TrainManager tm = new TrainManager(Configuration); tm.Start();
 		}
 	}
 }

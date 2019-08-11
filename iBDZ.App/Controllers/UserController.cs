@@ -25,6 +25,14 @@ namespace iBDZ.App.Controllers
 				return View(receipt);
         }
 
+		[HttpPost]
+		[Authorize]
+		public IActionResult Refund(string id)
+		{
+			userService.RefundPurchase(User, id);
+			return Redirect("/User/Purchases");
+		}
+
 		[HttpGet]
 		[Authorize]
 		public IActionResult Purchases()

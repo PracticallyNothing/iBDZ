@@ -170,7 +170,7 @@ namespace iBDZ.Services
 		}
 
 		// Protected from bad input.
-		public void EditTrain(string json)
+		public string EditTrain(string json)
 		{
 			try
 			{
@@ -194,12 +194,15 @@ namespace iBDZ.Services
 				// Can't throw, but doesn't need to, since we can't get corrupted data here.
 				db.Trains.Update(t);
 				db.SaveChanges();
+				return t.Id;
 			}
 			catch
 			{
 				// Ignore bad input and don't react.
 				// Any bad JSON comes from bad actors, not users.
+				return "";
 			}
+
 		}
 
 		// Protected from bad input.

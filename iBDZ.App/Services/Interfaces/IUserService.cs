@@ -8,5 +8,6 @@ namespace iBDZ.Services
     {
 		List<ShortReceiptModel> GetUserPurchasesList(string username);
 		ReceiptModel GetReceipt(string username, string rid);
+		void RefundPurchase(ClaimsPrincipal user, string id);
 	}
 }

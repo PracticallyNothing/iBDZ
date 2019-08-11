@@ -11,6 +11,6 @@ namespace iBDZ.Data.ViewModels
 
 		public List<string> Roles { get; set; }
 
-		public DateTime LastPurchase { get; set; }
+		public DateTime? LastPurchase { get; set; }
     }
 }

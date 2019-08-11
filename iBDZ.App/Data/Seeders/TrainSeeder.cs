@@ -12,6 +12,11 @@ namespace iBDZ.App.Data.Seeders
 	{
 		public void Seed(IServiceProvider serviceProvider)
 		{
+			AddTrains(serviceProvider);
+		}
+
+		public static void AddTrains(IServiceProvider serviceProvider)
+		{
 			var db = serviceProvider.GetRequiredService<iBDZDbContext>();
 			if (db.Trains.Count() < NumTrains && db.Routes.Any())
 			{
@@ -24,16 +29,19 @@ namespace iBDZ.App.Data.Seeders
 			db.SaveChanges();
 		}
 
-		public static Train GenTrain(iBDZDbContext db) {
+		public static Train GenTrain(iBDZDbContext db)
+		{
 			Random r = new Random();
 
 			DateTime today = DateTime.Today;
 			DateTime timeOfDep = today.AddHours(r.NextDouble() * 7 + 4);
 			DateTime timeOfArrival = timeOfDep.AddMinutes(r.NextDouble() * 120 + 125);
 
+			List<Route> routes = db.Routes.ToList();
+
 			Train t = new Train()
 			{
-				Route = db.Routes.Skip(r.Next(0, db.Routes.Count() - 1)).First(),
+				Route = routes.Skip(r.Next(0, db.Routes.Count() - 1)).First(),
 				TimeOfDeparture = timeOfDep,
 				TimeOfArrival = timeOfArrival,
 				Type = (TrainType)Enum.GetValues(typeof(TrainType)).GetValue(r.Next(Enum.GetValues(typeof(TrainType)).Length)),
@@ -47,10 +55,12 @@ namespace iBDZ.App.Data.Seeders
 
 		private const int NumTrains = 50;
 		private const int MinNumCars = 4;
-		private const int MaxNumCars = 9;
+		private const int MaxNumCars = 12;
 
 		// What relative part of all train cars will be sleeping cars?
 		private const double BedCarsDistrib = 0.5;
+		// What relative part of all train cars will be business class?
+		private const double BusinessClassDistrib = 0.5;
 		// What relative part of all train cars will be first class?
 		private const double FirstClassDistrib = 1;
 		// What relative part of all train cars will be second class?
@@ -58,44 +68,29 @@ namespace iBDZ.App.Data.Seeders
 
 		private static void FillTrainCars(int numCars, Train train, iBDZDbContext db)
 		{
-			RatioDistributor rd = new RatioDistributor(SecondClassDistrib, FirstClassDistrib, BedCarsDistrib);
+			RatioDistributor rd = new RatioDistributor(SecondClassDistrib, FirstClassDistrib, BedCarsDistrib, BusinessClassDistrib);
 			var carDistributions = rd.DistributeInt(numCars);
 
-			for (int i = 0; i < carDistributions[0]; i++)
+			List<TrainCar> templates = new List<TrainCar>()
 			{
-				TrainCar c = new TrainCar()
-				{
-					Type = TrainCarType.Compartments,
-					Class = TrainCarClass.Second
-				};
+				new TrainCar() { Type = TrainCarType.Compartments, Class = TrainCarClass.Second },
+				new TrainCar() { Type = TrainCarType.Compartments, Class = TrainCarClass.First },
+				new TrainCar() { Type = TrainCarType.Beds, Class = TrainCarClass.Business },
+				new TrainCar() { Type = TrainCarType.Compartments, Class = TrainCarClass.Business },
+			};
 
-				FillSeats(c, db);
-				train.Cars.Add(c);
-				db.TrainCars.Add(c);
-			}
-			for (int i = 0; i < carDistributions[1]; i++)
+			int templateIndex = 0;
+
+			foreach (int distrib in carDistributions)
 			{
-				TrainCar c = new TrainCar()
+				for (int i = 0; i < carDistributions[0]; i++)
 				{
-					Type = TrainCarType.Compartments,
-					Class = TrainCarClass.First
-				};
-
-				FillSeats(c, db);
-				train.Cars.Add(c);
-				db.TrainCars.Add(c);
-			}
-			for (int i = 0; i < carDistributions[2]; i++)
-			{
-				TrainCar c = new TrainCar()
-				{
-					Type = TrainCarType.Beds,
-					Class = TrainCarClass.Business
-				};
-
-				FillSeats(c, db);
-				train.Cars.Add(c);
-				db.TrainCars.Add(c);
+					TrainCar c = new TrainCar(templates[templateIndex]);
+					FillSeats(c, db);
+					train.Cars.Add(c);
+					db.TrainCars.Add(c);
+				}
+				templateIndex++;
 			}
 		}
 
@@ -107,7 +102,7 @@ namespace iBDZ.App.Data.Seeders
 				// ... however, compartment and sleeping cars have a different number of places available.
 				if (car.Type == TrainCarType.Compartments)
 				{
-					// First class compartments have six seats.
+					// First and business class compartments have six seats.
 					if (car.Class == TrainCarClass.First || car.Class == TrainCarClass.Business)
 					{
 						for (int j = 1; j <= 6; j++)

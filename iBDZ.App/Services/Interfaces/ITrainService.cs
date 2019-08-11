@@ -9,7 +9,7 @@ namespace iBDZ.Services
 	{
 		TrainInfoModel GetTrainInfoFromId(string trainId);
 		Tuple<List<ShortTrainInfoModel>, string, string> GetTimetable(string startStation, string endStation);
-		void EditTrain(string json);
+		string EditTrain(string json);
 		void DeleteTrain(string id);
 		string GenerateNewTrain();
 	}

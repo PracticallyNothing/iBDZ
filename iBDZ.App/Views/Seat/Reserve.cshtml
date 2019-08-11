@@ -13,12 +13,15 @@
         <h2>Train: @Model.TrainId</h2>
         <h3>Car ID: <b>@Model.CarId</b></h3>
         <h4>Type: <b>@Model.Type.ToString()</b></h4>
-        <h4>Class: <b>@Model.Class.ToString()</b></h4>
+        @if (Model.Type == iBDZ.Data.TrainCarType.Compartments)
+        {
+            <h4>Class: <b>@Model.Class.ToString()</b></h4>
+        }
 
         <hr />
 
         <h3>Coupe: <b>@Model.Coupe</b></h3>
-        <label for="num-seats">Number of seats:</label>
+        <label for="num-seats">Number of @(Model.Type == iBDZ.Data.TrainCarType.Compartments ? "seats" : "beds"):</label>
         <input name="num-seats" type="number" min="1" max="@Model.FreeSeats.Count" value="1" />
 
         <hr />
@@ -34,20 +37,20 @@
 
 @if (Model.TrainId == "")
 {
-<script>
-    var form = document.getElementById("purchase-form")
-    form.onsubmit = function (event) {
-        event.preventDefault();
-    }
+    <script>
+        var form = document.getElementById("purchase-form")
+        form.onsubmit = function (event) {
+            event.preventDefault();
+        }
 
-    let submitButton = document.getElementById("purchase-submit")
-    submitButton.setAttribute("disabled", "");
-    submitButton.innerHTML = "Can't purchase. Incorrect data"
-</script>
+        let submitButton = document.getElementById("purchase-submit")
+        submitButton.setAttribute("disabled", "");
+        submitButton.innerHTML = "Can't purchase. Incorrect data"
+    </script>
 }
 else
 {
-<script>
+    <script>
     var numSeats = document.getElementsByName("num-seats")[0]
     numSeats.onchange = function() {
         let basePrice = @String.Format("{0:F2}", Model.BasePrice);
@@ -78,5 +81,5 @@ else
             submitButton.innerHTML = "Finalizing purchase..."
             })
     }
-</script>
+    </script>
 }

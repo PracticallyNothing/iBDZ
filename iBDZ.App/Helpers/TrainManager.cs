@@ -36,17 +36,15 @@ namespace iBDZ.App.Helpers
 
 		private void RepurposeTrains()
 		{
+			Random r = new Random();
+			var opts = new DbContextOptionsBuilder<iBDZDbContext>();
+			opts.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+
 			while (IsRunning)
 			{
-				Random r = new Random();
-				List<Train> trains;
-
-				var opts = new DbContextOptionsBuilder<iBDZDbContext>();
-				opts.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
-
 				using (iBDZDbContext db = new iBDZDbContext(opts.Options))
 				{
-					trains = db.Trains
+					List<Train> trains = db.Trains
 						.Include(x => x.Route)
 						.Include(x => x.Cars)
 							.ThenInclude(x => x.Seats)

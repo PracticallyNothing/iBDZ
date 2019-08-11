@@ -20,6 +20,10 @@
         padding-left: 5px;
         padding-right: 5px;
     }
+
+    .delay {
+        color: red;
+    }
 </style>
 
 <div class="text-center">
@@ -82,11 +86,18 @@
     </thead>
     @foreach (var t in Model.Item1)
     {
-        <tr class="clickable" on onclick="showTrainInfo('@t.TrainId')">
-            <td>@t.Route</td>
-            <td>@t.TimeOfDeparture</td>
-            <td>@t.TimeOfArrival</td>
-            <td>@t.FreeSeats / @t.MaxSeats</td>
-        </tr>
+    <tr class="clickable" onclick="showTrainInfo('@t.TrainId')">
+        <td>@t.Route</td>
+        @if (t.Delay.Ticks == 0)
+        {
+            <td>@t.TimeOfDeparture.ToString(@"HH\:mm dd\.MM\.yyyy")</td>
+        }
+        else
+        {
+            <td>@t.TimeOfDeparture.ToString(@"HH\:mm dd\.MM\.yyyy") <span class="delay">+@(t.Delay.ToString(@"mm:ss"))</span></td>
+        }
+        <td>@t.TimeOfArrival.ToString(@"HH\:mm dd\.MM\.yyyy")</td>
+        <td>@t.FreeSeats / @t.MaxSeats</td>
+    </tr>
     }
 </table>

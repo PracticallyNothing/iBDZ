@@ -28,58 +28,7 @@
     }
 
     #TimetablePanel {
-        background-image: url("images/train4.jpg")
-    }
-
-    .MyPanel:hover {
-        cursor: pointer;
-        filter: brightness(115%);
-        background-size: 125% 250%;
-        transition: all 0.15s ease-in;
-    }
-
-    .MyPanel {
-        height: 200px;
-        line-height: 200px;
-        width: 100%;
-        text-align: center;
-        font-size: 22pt;
-        margin-top: 15px;
-        background-color: white;
-        transition: all 0.35s ease-out;
-        background-size: 100% 200%;
-        background-position: center;
-        background-repeat: no-repeat;
-        filter: brightness(50%);
-    }
-
-    .MyPanelText {
-        display: inline-block;
-        vertical-align: middle;
-        line-height: normal;
-        background-color: black;
-        color: white;
-        padding: 7px;
-        border-radius: 6px;
-    }
-
-    .MyButton:hover {
-        cursor: pointer;
-        transition: all 0.15s ease-in;
-        background-color: #eee;
-    }
-
-    .MyButton {
-        height: 80px;
-        padding-left: 30px;
-        padding-right: 30px;
-        display: inline-block;
-        width: auto;
-        border: solid 1px black;
-        text-align: center;
-        border-radius: 6px;
-        transition: all 0.15s ease-out;
-        background-color: #ccc;
+        background-image: url("/images/train4.jpg")
     }
 
     hr {
@@ -101,11 +50,11 @@
         {
             <style>
                 #FindSeatsPanel {
-                    background-image: url("images/kupe.png");
+                    background-image: url("/images/kupe.png");
                 }
 
                 #PurchasesPanel {
-                    background-image: url("images/wallet.png");
+                    background-image: url("/images/wallet.png");
                 }
             </style>
 
@@ -125,19 +74,16 @@
         {
             <hr />
 
-            <h2>You don't seem to be in your account.</h2><br />
-            <h3>You should:</h3><br />
+            <h2>You don't seem to be logged into your account.</h2>
+            <h3>Get access to more features by logging in or registering.</h3><br />
             <div class="MyButton" onclick="window.location.href = '/Identity/Account/Login'"><h2>Login</h2></div>
-
-            <h3>Or</h3>
-
             <div class="MyButton" onclick="window.location.href = '/Identity/Account/Register'"><h2>Register</h2></div>
         }
         @if (User.IsInRole("Administrator") || User.IsInRole("SuperUser"))
         {
             <style>
                 #UsersPanel {
-                    background-image: url("images/users.png")
+                    background-image: url("/images/users.png")
                 }
             </style>
             <div class="MyPanel" id="UsersPanel" onclick="window.location.href = '/Admin/Users'">

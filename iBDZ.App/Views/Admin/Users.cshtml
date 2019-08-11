@@ -22,13 +22,13 @@
             <tr class="clickable" onclick="showUserInfo('@user.Id')">
                 <td>@user.UserName</td>
                 <td>@String.Join(", ", user.Roles)</td>
-                @if (user.LastPurchase == null)
+                @if (!user.LastPurchase.HasValue)
                 {
                     <td><em>N/A</em></td>
                 }
                 else
                 {
-                    <td>@user.LastPurchase.ToString(@"hh\:mm dd\.MM\.yyyy")</td>
+                    <td>@user.LastPurchase.Value.ToString(@"HH\:mm dd\.MM\.yyyy")</td>
                 }
             </tr>
         }

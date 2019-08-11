@@ -45,9 +45,11 @@ namespace iBDZ.Services
 				TimeOfDeparture = receipt.TimeOfDeparture,
 				TimeOfArrival = receipt.TimeOfArrival,
 
-				CarId = p.Seat.Car.Id,
+				CarId = p.Seat.Car.Id.Substring(0, 4),
 				Type = p.Seat.Car.Type,
 				Class = p.Seat.Car.Class,
+
+				UserName = receipt.User.UserName,
 
 				Coupe = p.Seat.Coupe,
 				ReservedSeatNumbers = new List<int>(),
@@ -81,7 +83,7 @@ namespace iBDZ.Services
 						.ThenInclude(x => x.Route)
 					.Where(x => x.User.UserName == username)
 					.ToList();
-			
+
 			List<ShortReceiptModel> shortReceipts = receipts
 					.Select(x => new ShortReceiptModel
 					{
@@ -94,6 +96,37 @@ namespace iBDZ.Services
 					.ToList();
 
 			return shortReceipts;
+		}
+
+		public void RefundPurchase(ClaimsPrincipal user, string id)
+		{
+			Receipt r = db.Receipts
+				.Include(x => x.Purchases).ThenInclude(x => x.Seat)
+				.Include(x => x.User)
+				.FirstOrDefault(x => x.Id == id);
+
+			// Returns on bad id.
+			if (r == null)
+			{
+				return;
+			}
+
+			// Returns on unrefundable purchase.
+			if (!r.IsRefundable)
+			{
+				return;
+			}
+
+			// Returns when user doesn't match.
+			if (user.Identity.Name != r.User.UserName)
+			{
+				return;
+			}
+
+			r.Purchases.ForEach(x => { x.Seat.Reserver = null; db.Seats.Update(x.Seat); });
+			db.Purchases.RemoveRange(r.Purchases);
+			db.Receipts.Remove(r);
+			db.SaveChanges();
 		}
 	}
 }

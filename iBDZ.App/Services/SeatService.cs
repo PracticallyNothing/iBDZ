@@ -55,7 +55,7 @@ namespace iBDZ.Services
 
 				List<TrainCar> filtered;
 
-				if (ClassString == "Any")
+				if (ClassString == "Any" || TrainCarType == TrainCarType.Beds)
 				{
 					filtered = db.TrainCars
 						.Include(x => x.Seats).ThenInclude(x => x.Reserver)

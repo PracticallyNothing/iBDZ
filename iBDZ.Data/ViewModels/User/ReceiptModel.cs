@@ -17,6 +17,8 @@ namespace iBDZ.Data.ViewModels
 		public DateTime TimeOfDeparture { get; set; }
 		public DateTime TimeOfArrival { get; set; }
 
+		public string UserName { get; set; }
+
 		public string CarId { get; set; }
 		public TrainCarType Type { get; set; }
 		public TrainCarClass Class { get; set; }

@@ -19,6 +19,16 @@ namespace iBDZ.Data
 			Seats = new List<Seat>();
 		}
 
+		/// <summary>
+		/// Copy constructor. Only copies type and class.
+		/// </summary>
+		/// <param name="other">TrainCar to copy</param>
+		public TrainCar(TrainCar other)
+		{
+			this.Class = other.Class;
+			this.Type = other.Type;
+		}
+
 		public string Id { get; set; }
 		public TrainCarClass Class { get; set; }
 		public TrainCarType Type { get; set; }

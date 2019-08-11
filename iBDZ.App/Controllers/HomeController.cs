@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using iBDZ.Data.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace iBDZ.App.Controllers
 {
@@ -8,5 +10,11 @@ namespace iBDZ.App.Controllers
         {
             return View();
         }
-    }
+		
+		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+		public IActionResult Error()
+		{
+			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+		}
+	}
 }
